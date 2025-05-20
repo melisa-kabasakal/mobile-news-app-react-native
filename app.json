@@ -13,17 +13,31 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.yeniyasam",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Uygulama kamera erişimi gerektiriyor.",
+        "NSPhotoLibraryUsageDescription": "Fotoğraf kütüphanesine erişim gerekiyor.",
+        "NSLocationWhenInUseUsageDescription": "Konum bilginiz haber içerikleri için kullanılır.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.YeniYasam"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-font"
+    ]
   }
 }

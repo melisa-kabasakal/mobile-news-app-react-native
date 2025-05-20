@@ -1,20 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import * as ScreenOrientation from 'expo-screen-orientation'; // burayı ekledik
+
+import { ThemeProvider } from './src/context/ThemeProvider';
+import { SearchProvider } from './src/context/SearchContext';
+
+import BottomTabs from './src/navigation/BottomTabs';
 
 export default function App() {
+  // Uygulama başladığında ekranı dikeye kilitle
+  useEffect(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ThemeProvider>
+      <NavigationContainer>
+        <SearchProvider>
+          <BottomTabs />
+        </SearchProvider>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

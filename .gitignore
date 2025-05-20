@@ -35,3 +35,49 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Node modules
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# React Native Android/iOS build folders
+android/
+ios/
+
+# Kotlin
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro bundler
+.metro-health-check*
+
+# Debug files
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Env files
+.env
+.env*.local
+
+# TypeScript build
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
