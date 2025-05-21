@@ -1,5 +1,14 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, Image, TouchableOpacity, useWindowDimensions} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  useWindowDimensions,
+  ScrollView,
+} from 'react-native';
 import axios from 'axios';
 import he from 'he';
 import { useNavigation } from '@react-navigation/native';
@@ -58,29 +67,32 @@ const AllPostsScreen = () => {
     }
   };
 
-  const renderItem = ({ item }) => {
-    const imageUrl = item._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-    const title = he.decode(item.title.rendered);
-    const excerpt = he.decode(item.excerpt.rendered.replace(/<[^>]+>/g, ''));
+  const renderPosts = () => {
+    return posts.map((item) => {
+      const imageUrl = item._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      const title = he.decode(item.title.rendered);
+      const excerpt = he.decode(item.excerpt.rendered.replace(/<[^>]+>/g, ''));
 
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('AllPostDetail', { post: item })}
-        style={[
-          styles.card,
-          {
-            backgroundColor: isDarkMode ? '#1a1a1a' : '#fff',
-            borderColor: isDarkMode ? '#333' : '#ddd',
-          },
-        ]}
-      >
-        {imageUrl && (
-          <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
-        )}
-        <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#333' }]}>{title}</Text>
-        <Text style={[styles.excerpt, { color: isDarkMode ? '#ccc' : '#666' }]}>{excerpt}</Text>
-      </TouchableOpacity>
-    );
+      return (
+        <TouchableOpacity
+          key={item.id}
+          onPress={() => navigation.navigate('AllPostDetail', { post: item })}
+          style={[
+            styles.card,
+            {
+              backgroundColor: isDarkMode ? '#1a1a1a' : '#fff',
+              borderColor: isDarkMode ? '#333' : '#ddd',
+            },
+          ]}
+        >
+          {imageUrl && (
+            <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+          )}
+          <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#333' }]}>{title}</Text>
+          <Text style={[styles.excerpt, { color: isDarkMode ? '#ccc' : '#666' }]}>{excerpt}</Text>
+        </TouchableOpacity>
+      );
+    });
   };
 
   if (loading && page === 1) {
@@ -93,29 +105,23 @@ const AllPostsScreen = () => {
 
   return (
     <MainLayout>
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id.toString()}
+      <ScrollView
         contentContainerStyle={[
           styles.container,
           { backgroundColor: isDarkMode ? '#000' : '#f9f9f9' },
         ]}
-        renderItem={renderItem}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.7}
-        ListFooterComponent={
-          <>
-            {isLoadingMore && (
-              <View style={{ paddingVertical: 20 }}>
-                <ActivityIndicator color="#aaa" />
-              </View>
-            )}
-            <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
+        onMomentumScrollEnd={handleLoadMore}
+      >
+        {renderPosts()}
+        {isLoadingMore && (
+          <View style={{ paddingVertical: 20 }}>
+            <ActivityIndicator color="#aaa" />
+          </View>
+        )}
+        <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
           <Footer />
         </View>
-          </>
-        }
-      />
+      </ScrollView>
     </MainLayout>
   );
 };

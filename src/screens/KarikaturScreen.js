@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   ActivityIndicator,
   StyleSheet,
-  ScrollView,
+  FlatList,
   useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import RenderHtml from 'react-native-render-html';
@@ -16,8 +17,11 @@ import Footer from '../components/Footer';
 const KarikaturScreen = () => {
   const { isDarkMode } = useTheme();
   const { width } = useWindowDimensions();
-  const [content, setContent] = useState('');
+  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(5);
+
+  const PROXY = 'https://69a5-88-253-133-120.ngrok-free.app';
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -26,44 +30,27 @@ const KarikaturScreen = () => {
           'https://yeniyasamgazetesi9.com/wp-json/wp/v2/pages/238943'
         );
 
-        const LOCAL_IP = 'http://192.168.1.100:3001'; // ✅ Burada tanımladık
-
         let html = response.data.content.rendered;
 
         html = html.replace(
           /<img([^>]+)src=['"]{1}['"]{1}([^>]+)data-src=['"]([^'"]+)['"]/gi,
           '<img$1src="$3"$2data-src="$3"'
         );
-
         html = html.replace(
           /<img([^>]*?)data-src=['"]([^'"]+)['"]/gi,
           '<img$1src="$2" data-src="$2"'
         );
 
-        html = html.replace(
-          /<img[^>]*src="([^"]+)"[^>]*>/gi,
-          (match, src) => {
-            if (src.includes('yeniyasamgazetesi9.com/wp-content/uploads/')) {
-              const encoded = encodeURIComponent(src);
-              const fullProxyUrl = `${LOCAL_IP}/proxy-image?url=${encoded}`;
-              console.log('Görsel yönlendirme:', fullProxyUrl);
-              return match.replace(src, fullProxyUrl);
-            }
-            return '';
-          }
-        );
+        const matchedImages = [...html.matchAll(/<img[^>]*src="([^"]+)"[^>]*>/gi)];
 
-        setContent(html);
-      } catch (error) {
-        if (
-          error.response?.status === 404 ||
-          error.response?.status === 408 ||
-          error.response?.status === 204
-        ) {
-          console.log('Karikatür sayfası yüklendi ama bazı görseller eksik.');
-        } else {
-          console.error('Karikatür sayfası ciddi hata:', error.message);
-        }
+        const valid = matchedImages
+          .map(match => match[1])
+          .filter(src => src.includes('yeniyasamgazetesi9.com/wp-content/uploads/'))
+          .map(src => `${PROXY}/proxy-image?url=${encodeURIComponent(src)}`);
+
+        setImages(valid);
+      } catch (err) {
+        console.warn('Karikatür verisi alınamadı:', err.message);
       } finally {
         setLoading(false);
       }
@@ -72,14 +59,13 @@ const KarikaturScreen = () => {
     fetchPage();
   }, []);
 
-  const renderHtmlContent = useMemo(() => (
+  const renderItem = ({ item }) => (
     <RenderHtml
       contentWidth={width}
-      source={{ html: content }}
+      source={{ html: `<img src="${item}" />` }}
       baseStyle={{
-        color: isDarkMode ? '#fff' : '#000',
-        fontSize: 16,
-        lineHeight: 24,
+        marginVertical: 10,
+        borderRadius: 10,
       }}
       tagsStyles={{
         img: {
@@ -87,11 +73,14 @@ const KarikaturScreen = () => {
           height: 'auto',
           resizeMode: 'contain',
           marginVertical: 10,
-          borderRadius: 10,
         },
       }}
     />
-  ), [content, width, isDarkMode]);
+  );
+
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 5);
+  };
 
   if (loading) {
     return (
@@ -105,20 +94,30 @@ const KarikaturScreen = () => {
 
   return (
     <MainLayout>
-  <ScrollView
-    contentContainerStyle={[
-      styles.container,
-      { backgroundColor: isDarkMode ? '#000' : '#fff' },
-    ]}
-  >
-   
-
-    {renderHtmlContent}
-
-    <Footer />
-  </ScrollView>
-</MainLayout>
-
+      <FlatList
+        data={images.slice(0, visibleCount)}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: isDarkMode ? '#000' : '#fff' },
+        ]}
+        ListFooterComponent={
+          <>
+            {visibleCount < images.length && (
+              <TouchableOpacity onPress={handleLoadMore} style={styles.loadMoreBtn}>
+                <Text style={styles.loadMoreText}>Daha fazla göster</Text>
+              </TouchableOpacity>
+            )}
+            <Footer />
+          </>
+        }
+        initialNumToRender={5}
+        windowSize={10}
+        removeClippedSubviews={false}
+        keyboardShouldPersistTaps="handled"
+      />
+    </MainLayout>
   );
 };
 
@@ -131,11 +130,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-   
+    padding: 16,
+    paddingBottom: 80,
   },
-  title: {
-    fontSize: 22,
+  loadMoreBtn: {
+    padding: 12,
+    marginVertical: 20,
+    backgroundColor: '#006c9b',
+    borderRadius: 8,
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
+  loadMoreText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 20,
   },
 });

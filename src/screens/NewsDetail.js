@@ -20,9 +20,7 @@ const NewsDetail = ({ route }) => {
   const [newsDetail, setNewsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const { width } = useWindowDimensions();
-
 
   const cleanText = (html) => {
     let text = html.replace(/<[^>]*>/g, '');
@@ -38,7 +36,6 @@ const NewsDetail = ({ route }) => {
       const regex = new RegExp(entity, 'g');
       text = text.replace(regex, entities[entity]);
     }
-    text = text.replace(/#[0-9]{1,4}/g, '');
 
     return text.trim();
   };
@@ -46,12 +43,15 @@ const NewsDetail = ({ route }) => {
   useEffect(() => {
     const fetchNewsDetail = async () => {
       try {
-        const response = await axios.get(`https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts/${postId}?_embed`);
+        const response = await axios.get(
+          `https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts/${postId}?_embed`
+        );
         const data = response.data;
 
         const title = data.title?.rendered || 'Başlık Bulunamadı';
         const content = data.content?.rendered || 'İçerik Bulunamadı';
-        const image = data._embedded?.['wp:featuredmedia']?.[0]?.source_url || 'https://via.placeholder.com/300x180.png?text=No+Image';
+        const image = data._embedded?.['wp:featuredmedia']?.[0]?.source_url
+          || 'https://via.placeholder.com/300x180.png?text=No+Image';
 
         setNewsDetail({ title, content, image });
       } catch (err) {
@@ -67,7 +67,9 @@ const NewsDetail = ({ route }) => {
   if (loading) {
     return (
       <MainLayout>
-        <ActivityIndicator size="large" color={theme.text} style={styles.loader} />
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={theme.text} />
+        </View>
       </MainLayout>
     );
   }
@@ -75,21 +77,29 @@ const NewsDetail = ({ route }) => {
   if (error || !newsDetail) {
     return (
       <MainLayout>
-        <Text style={styles.errorText}>Haber detayları yüklenemedi.</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
       </MainLayout>
     );
   }
 
   return (
     <MainLayout>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Image source={{ uri: newsDetail.image }} style={styles.image} />
+
         <Text style={[styles.title, { color: theme.text }]}>
           {cleanText(newsDetail.title)}
         </Text>
+
         <Text style={[styles.content, { color: theme.text }]}>
           {cleanText(newsDetail.content)}
         </Text>
+
         <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
           <Footer />
         </View>
@@ -101,41 +111,39 @@ const NewsDetail = ({ route }) => {
 export default NewsDetail;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   scrollContent: {
-    padding: 15,
-    paddingBottom: 60,
+    padding: 16,
+    paddingBottom: 100,
+    flexGrow: 1,
   },
   loader: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   image: {
     width: '100%',
     height: 250,
     resizeMode: 'cover',
-    alignSelf: 'center',
-    marginBottom: 15,
+    marginBottom: 16,
+    borderRadius: 8,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 15,
-    paddingLeft: 5,
+    marginBottom: 12,
   },
   content: {
     fontSize: 16,
     lineHeight: 24,
-    marginTop: 10,
-    marginBottom: 20,
-    paddingHorizontal: 5,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
   },
   errorText: {
-    fontSize: 18,
-    textAlign: 'center',
+    fontSize: 16,
     color: 'red',
+    textAlign: 'center',
   },
 });

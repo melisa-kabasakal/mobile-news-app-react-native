@@ -106,10 +106,8 @@ const Kadin = () => {
         data={posts}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
+        style={{ backgroundColor: isDarkMode ? '#000' : '#fff' }}
+        contentContainerStyle={styles.container}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.7}
         ListFooterComponent={

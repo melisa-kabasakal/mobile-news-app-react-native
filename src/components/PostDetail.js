@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,15 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import RenderHtml from 'react-native-render-html';
-import Header from '../components/Header';
 import { decode } from 'html-entities';
+import { useTheme } from '../context/ThemeProvider';
+import MainLayout from '../components/MainLayout';
+import Footer from '../components/Footer';
 
 const PostDetail = ({ route }) => {
-  const { postId, writerLink } = route.params;
+  const { postId } = route.params;
   const { width } = useWindowDimensions();
+  const { isDarkMode } = useTheme();
 
   const [postDetail, setPostDetail] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,12 +26,12 @@ const PostDetail = ({ route }) => {
 
   useEffect(() => {
     if (!postId) {
-      setError('Geçersiz postId!');
+      setError('Geçersiz içerik ID’si.');
       setLoading(false);
       return;
     }
 
-    const fetchPostDetail = async () => {
+    const fetchPost = async () => {
       try {
         const response = await axios.get(
           `https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts/${postId}?_embed`
@@ -36,102 +39,130 @@ const PostDetail = ({ route }) => {
         const post = response.data;
 
         const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url || null;
-
         setPostDetail({ ...post, imageUrl });
       } catch (err) {
-        console.error('Hata:', err.message);
-        setError('Detaylar yüklenemedi.');
+        setError('İçerik yüklenemedi.');
+        console.error('PostDetail hatası:', err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPostDetail();
+    fetchPost();
   }, [postId]);
+
+  const renderedHtml = useMemo(() => {
+    return (
+      <RenderHtml
+        contentWidth={width}
+        source={{ html: postDetail?.content?.rendered || '' }}
+        tagsStyles={{
+          p: {
+            fontSize: 16,
+            lineHeight: 24,
+            marginBottom: 12,
+            color: isDarkMode ? '#ccc' : '#333',
+          },
+          h1: {
+            fontSize: 22,
+            fontWeight: 'bold',
+            color: isDarkMode ? '#fff' : '#000',
+            marginBottom: 16,
+          },
+          img: {
+            width: '100%',
+            height: 'auto',
+            marginVertical: 15,
+            borderRadius: 8,
+          },
+        }}
+        renderersProps={{
+          img: {
+            enableExperimentalPercentWidth: true,
+          },
+        }}
+      />
+    );
+  }, [postDetail, width, isDarkMode]);
 
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#006c9b" />
-      </View>
+      <MainLayout>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#006c9b" />
+        </View>
+      </MainLayout>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
+      <MainLayout>
+        <View style={styles.center}>
+          <Text style={[styles.errorText, { color: isDarkMode ? 'red' : '#c00' }]}>
+            {error}
+          </Text>
+        </View>
+      </MainLayout>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Header />
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+    <MainLayout>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { backgroundColor: isDarkMode ? '#000' : '#fff' },
+        ]}
+      >
         {postDetail?.imageUrl && (
-          <Image source={{ uri: postDetail.imageUrl }} style={styles.image} />
+          <Image
+            source={{ uri: postDetail.imageUrl }}
+            style={styles.image}
+            resizeMode="cover"
+          />
         )}
-        
 
-        <Text style={styles.title}>{decode(postDetail?.title?.rendered || '')}</Text>
+        <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
+          {decode(postDetail?.title?.rendered || '')}
+        </Text>
 
-        <RenderHtml
-          contentWidth={width}
-          source={{ html: postDetail?.content?.rendered || '' }}
-          tagsStyles={{
-            p: { fontSize: 16, lineHeight: 24, color: '#000', marginBottom: 12 },
-            img: { marginVertical: 15, maxWidth: '100%' },
-          }}
-          renderersProps={{
-            img: {
-              enableExperimentalPercentWidth: true,
-            },
-          }}
-        />
+        {renderedHtml}
+
+        <View style={{ marginTop: 40 }}>
+          <Footer />
+        </View>
       </ScrollView>
-    </View>
+    </MainLayout>
   );
 };
 
+export default PostDetail;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   scrollContent: {
     padding: 16,
-    paddingBottom: 60,
-    flexGrow: 1,
+    paddingBottom: 80,
   },
-  loaderContainer: {
+  center: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: 'center',
+    padding: 20,
   },
   image: {
     width: '100%',
-    height: 200,
-    borderRadius: 6,
+    height: 220,
+    borderRadius: 8,
     marginBottom: 16,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 16,
-    color: '#000',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
   },
   errorText: {
-    color: 'red',
     fontSize: 16,
     textAlign: 'center',
   },
 });
-
-export default PostDetail;

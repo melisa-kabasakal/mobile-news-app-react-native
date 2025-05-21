@@ -3,7 +3,6 @@ import {
   View,
   Text,
   Image,
-  FlatList,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
@@ -39,8 +38,8 @@ const SoylesiPreview = () => {
         setPosts(data);
       } catch (error) {
         if (__DEV__) {
-    console.log('Söyleşi preview uyarı:', error.message);
-  }
+          console.log('Söyleşi preview uyarı:', error.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -53,18 +52,6 @@ const SoylesiPreview = () => {
     navigation.navigate('AllPostDetail', { post });
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: isDarkMode ? '#111' : '#fff' }]}
-      onPress={() => handlePress(item.fullPost)}
-    >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
-        {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
-
   if (loading) {
     return <ActivityIndicator size="large" color="#006c9b" style={{ marginVertical: 20 }} />;
   }
@@ -74,15 +61,20 @@ const SoylesiPreview = () => {
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>
         Söyleşi
       </Text>
-       <View style={{ paddingHorizontal: 10 }}>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
-      />
-    </View>
+      <View style={styles.gridContainer}>
+        {posts.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            style={[styles.card, { backgroundColor: isDarkMode ? '#111' : '#fff' }]}
+            onPress={() => handlePress(item.fullPost)}
+          >
+            <Image source={{ uri: item.image }} style={styles.image} />
+            <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
+              {item.title}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
@@ -95,19 +87,19 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
   },
-  row: {
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    paddingHorizontal: 10,
   },
   card: {
     width: screenWidth / 2 - 20,
-    
-    overflow: 'hidden',
+    marginBottom: 16,
   },
   image: {
     width: '100%',
     height: 120,
-   
   },
   title: {
     fontSize: 14,

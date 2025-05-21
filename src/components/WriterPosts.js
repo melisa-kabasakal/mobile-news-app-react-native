@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import axios from 'axios';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -21,39 +22,37 @@ const WriterPosts = () => {
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const fetchPosts = async () => {
     if (!categoryId) {
       setError('Yazar kategorisi eksik.');
       setLoading(false);
       return;
     }
 
-    axios
-      .get(`https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts?categories=${categoryId}&_embed`)
-      .then((res) => {
-        setPosts(res.data);
-      })
-      .catch(() => {
-        setError('Yazılar alınırken bir hata oluştu.');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      const response = await axios.get(
+        `https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts?categories=${categoryId}&_embed`
+      );
+      setPosts(response.data);
+    } catch (err) {
+      setError('Yazılar alınırken bir hata oluştu.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPosts();
   }, [categoryId]);
 
-  if (loading) {
-    return <ActivityIndicator size="large" style={styles.loader} />;
-  }
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPosts();
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -69,6 +68,18 @@ const WriterPosts = () => {
     </TouchableOpacity>
   );
 
+  if (loading && !refreshing) {
+    return <ActivityIndicator size="large" style={styles.loader} color="#006c9b" />;
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.header, { color: isDarkMode ? '#fff' : '#000' }]}>
@@ -80,6 +91,18 @@ const WriterPosts = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={isDarkMode ? '#fff' : '#000'}
+          />
+        }
+        ListEmptyComponent={
+          <Text style={{ textAlign: 'center', color: isDarkMode ? '#999' : '#444' }}>
+            Henüz içerik bulunmamaktadır.
+          </Text>
+        }
       />
     </View>
   );
@@ -110,6 +133,7 @@ const styles = StyleSheet.create({
   },
   list: {
     gap: 12,
+    paddingBottom: 40,
   },
   item: {
     padding: 12,

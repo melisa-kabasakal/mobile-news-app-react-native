@@ -122,6 +122,12 @@ const Yasam = () => {
             <Footer />
           </>
         }
+        initialNumToRender={8}
+        windowSize={10}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={false}
+
       />
     </MainLayout>
   );

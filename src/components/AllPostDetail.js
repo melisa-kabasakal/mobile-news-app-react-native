@@ -40,38 +40,42 @@ const AllPostDetail = ({ route }) => {
 
   if (loading) {
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#006c9b" />
-      </View>
+      <MainLayout>
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#006c9b" />
+        </View>
+      </MainLayout>
     );
   }
 
   if (error || !post) {
     return (
-      <View style={styles.loaderContainer}>
-        <RenderHtml
-          contentWidth={width}
-          source={{ html: `<p style="color:red">${error || 'Hata oluştu.'}</p>` }}
-        />
-      </View>
+      <MainLayout>
+        <View style={styles.loaderContainer}>
+          <RenderHtml
+            contentWidth={width}
+            source={{ html: `<p style="color:red">${error || 'Hata oluştu.'}</p>` }}
+          />
+        </View>
+      </MainLayout>
     );
   }
 
- 
   const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-  // const imageUrl = imageUrlOriginal ? `http://192.168.1.x:3001/proxy-image?url=${encodeURIComponent(imageUrlOriginal)}` : null;
-
   const title = he.decode(post.title.rendered);
   const htmlContent = post.content.rendered;
 
   return (
     <MainLayout>
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
-      >
+  contentContainerStyle={[
+    styles.scrollContent,
+    { backgroundColor: isDarkMode ? '#000' : '#fff', flexGrow: 1 },
+  ]}
+  keyboardShouldPersistTaps="handled"
+  showsVerticalScrollIndicator={false}
+>
+
         {imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} />}
 
         <RenderHtml
@@ -130,7 +134,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 80,
-    flexGrow: 1, 
+    flexGrow: 1,
   },
   image: {
     width: '100%',
@@ -143,7 +147,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
   },
 });
 

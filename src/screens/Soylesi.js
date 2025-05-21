@@ -25,7 +25,8 @@ const Soylesi = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const LOCAL_IP = 'http://192.168.1.100:3001';
+  const LOCAL_IP = 'https://69a5-88-253-133-120.ngrok-free.app';
+
 
   const fetchPosts = async (pageNumber = 1) => {
     try {
@@ -59,16 +60,15 @@ const Soylesi = () => {
 
       setHasMore(newData.length > 0);
     } catch (error) {
-  if (
-    error.response?.status === 404 ||
-    error.response?.status === 408 ||
-    error.response?.status === 204
-  ) {
-    console.log('Söyleşi verisi eksik ama sayfa sorunsuz yüklendi.');
-  } else {
-    console.error('Söyleşi verisi ciddi hata:', error.message);
-  }
-
+      if (
+        error.response?.status === 404 ||
+        error.response?.status === 408 ||
+        error.response?.status === 204
+      ) {
+        console.log('Söyleşi verisi eksik ama sayfa sorunsuz yüklendi.');
+      } else {
+        console.error('Söyleşi verisi ciddi hata:', error.message);
+      }
     } finally {
       setLoading(false);
       setIsLoadingMore(false);
@@ -129,6 +129,7 @@ const Soylesi = () => {
           styles.container,
           { backgroundColor: isDarkMode ? '#000' : '#fff' },
         ]}
+        style={{ flex: 1 }}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.7}
         ListFooterComponent={
@@ -141,6 +142,11 @@ const Soylesi = () => {
             <Footer />
           </>
         }
+        initialNumToRender={6}
+        windowSize={10}
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={true}
       />
     </MainLayout>
   );

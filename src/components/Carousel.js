@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-    top: 10,
+   
     height: 400,
     justifyContent: 'start',
     alignItems: 'center',

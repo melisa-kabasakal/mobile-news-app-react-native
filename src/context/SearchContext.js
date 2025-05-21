@@ -12,15 +12,16 @@ export const SearchProvider = ({ children }) => {
   useEffect(() => {
   if (searchQuery.trim().length === 0) {
     setResults({ posts: [], videos: [], writers: [] });
-    return; // erken çık
+    return; 
   }
 
   const debouncedFetch = debounce(async () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `http://192.168.1.100:3001/search-all?q=${encodeURIComponent(searchQuery)}`
-      );
+  `https://69a5-88-253-133-120.ngrok-free.app/search-all?q=${encodeURIComponent(searchQuery)}`
+);
+
       setResults(res.data);
     } catch (err) {
       console.error('Search error:', err.message);

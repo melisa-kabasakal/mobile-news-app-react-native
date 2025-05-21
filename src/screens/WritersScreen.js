@@ -17,20 +17,22 @@ const WritersScreen = ({ navigation }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchWriters = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('http://192.168.1.100:3001/writers');
-        setWriters(response.data);
-      } catch (err) {
-        setError('Yazarlar yüklenemedi');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchWriters = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('https://69a5-88-253-133-120.ngrok-free.app/writers');
+      setWriters(response.data);
+    } catch (err) {
+      console.log('Yazarlar API hatası:', err.message); 
+      setError('Yazarlar yüklenemedi');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchWriters();
-  }, []);
+  fetchWriters();
+}, []);
+
 
   const handleWriterPress = (writerLink) => {
     setLoading(true);
@@ -58,6 +60,16 @@ const WritersScreen = ({ navigation }) => {
     );
   }
 
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => handleWriterPress(item.link)}
+    >
+      <Image source={{ uri: item.avatar }} style={styles.image} />
+      <Text style={styles.name}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <MainLayout>
       <FlatList
@@ -66,15 +78,13 @@ const WritersScreen = ({ navigation }) => {
         numColumns={3}
         contentContainerStyle={styles.container}
         columnWrapperStyle={styles.row}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => handleWriterPress(item.link)}
-          >
-            <Image source={{ uri: item.avatar }} style={styles.image} />
-            <Text style={styles.name}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={renderItem}
+        initialNumToRender={9}
+        windowSize={10}
+        maxToRenderPerBatch={12}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={false}
+
       />
     </MainLayout>
   );

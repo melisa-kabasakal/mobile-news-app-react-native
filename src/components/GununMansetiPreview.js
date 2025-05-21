@@ -17,12 +17,14 @@ const GununMansetiPreview = () => {
   const [firstImage, setFirstImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const LOCAL_IP = 'https://69a5-88-253-133-120.ngrok-free.app';
+
+
   useEffect(() => {
     const fetchPreview = async () => {
       try {
         const response = await axios.get(
           'https://yeniyasamgazetesi9.com/wp-json/wp/v2/pages/233944'
-          
         );
 
         let html = response.data.content.rendered;
@@ -36,7 +38,7 @@ const GununMansetiPreview = () => {
           '<img$1src="$2" data-src="$2"'
         );
 
-        const LOCAL_IP = 'http://192.168.1.100:3001';
+        // Proxy yönlendirme
         html = html.replace(
           /<img[^>]*src="([^"]+)"[^>]*>/gi,
           (match, src) => {
@@ -45,13 +47,14 @@ const GununMansetiPreview = () => {
           }
         );
 
+        // İlk görseli yakala
         const match = html.match(/<img[^>]*src="([^"]+)"[^>]*>/i);
         const firstImg = match ? match[1] : null;
         setFirstImage(firstImg);
       } catch (error) {
         if (__DEV__) {
-    console.log('Manşetler preview uyarı:', error.message);
-  }
+          console.warn('Manşetler preview uyarı:', error.message);
+        }
       } finally {
         setLoading(false);
       }
@@ -65,7 +68,7 @@ const GununMansetiPreview = () => {
   }
 
   return (
-    <View >
+    <View>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Günün Manşeti</Text>
       {firstImage && (
         <Image

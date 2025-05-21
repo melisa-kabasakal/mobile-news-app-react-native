@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, FlatList, ActivityIndicator, StyleSheet, Image, TouchableOpacity
+  View, Text, ActivityIndicator, StyleSheet, Image, TouchableOpacity, ScrollView
 } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
@@ -12,7 +12,7 @@ import Footer from '../components/Footer';
 const EditorunSectikleri = () => {
   const { isDarkMode } = useTheme();
   const navigation = useNavigation();
-  const categoryId = 17826; // Editörün Seçtikleri
+  const categoryId = 17826;
 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -76,23 +76,6 @@ const EditorunSectikleri = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
-      style={[
-        styles.card,
-        {
-          backgroundColor: isDarkMode ? '#111' : '#fff',
-          borderColor: isDarkMode ? '#333' : '#ddd',
-        },
-      ]}
-    >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>{item.title}</Text>
-      <Text style={[styles.excerpt, { color: isDarkMode ? '#ccc' : '#444' }]}>{item.excerpt}</Text>
-    </TouchableOpacity>
-  );
-
   if (loading) {
     return (
       <MainLayout>
@@ -103,23 +86,39 @@ const EditorunSectikleri = () => {
 
   return (
     <MainLayout>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.7}
-        ListFooterComponent={
-          <>
-            {isLoadingMore && <ActivityIndicator style={{ padding: 20 }} color="#aaa" />}
-            <Footer />
-          </>
-        }
-      />
+      <ScrollView
+  style={{ flex: 1 }} 
+  contentContainerStyle={[
+    styles.container,
+    { backgroundColor: isDarkMode ? '#000' : '#fff' },
+  ]}
+  onMomentumScrollEnd={handleLoadMore}
+  keyboardShouldPersistTaps="handled" 
+  showsVerticalScrollIndicator={false} 
+>
+
+        {posts.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
+            style={[
+              styles.card,
+              {
+                backgroundColor: isDarkMode ? '#111' : '#fff',
+                borderColor: isDarkMode ? '#333' : '#ddd',
+              },
+            ]}
+          >
+            <Image source={{ uri: item.image }} style={styles.image} />
+            <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>{item.title}</Text>
+            <Text style={[styles.excerpt, { color: isDarkMode ? '#ccc' : '#444' }]}>{item.excerpt}</Text>
+          </TouchableOpacity>
+        ))}
+
+        {isLoadingMore && <ActivityIndicator style={{ padding: 20 }} color="#aaa" />}
+
+        <Footer />
+      </ScrollView>
     </MainLayout>
   );
 };

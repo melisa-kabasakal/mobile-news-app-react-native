@@ -3,16 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Image,
+  ScrollView,
   Dimensions,
 } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-
 import Entypo from 'react-native-vector-icons/Entypo';
-
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -23,7 +21,7 @@ const VideoHighlight = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const res = await axios.get('http://192.168.1.100:3001/video-playlist');
+        const res = await axios.get('https://69a5-88-253-133-120.ngrok-free.app/video-playlist');
         setVideos(res.data.slice(0, 5));
       } catch (err) {
         console.warn('Video verisi alınamadı', err.message);
@@ -48,33 +46,32 @@ const VideoHighlight = () => {
 
       <TouchableOpacity onPress={() => goToDetail(main.youtubeId)} style={styles.mainVideo}>
         <Image source={{ uri: main.thumbnail }} style={styles.mainImage} />
-       <View style={styles.playButton}>
-  <Entypo name="controller-play" size={28} color="#fff" />
-</View>
+        <View style={styles.playButton}>
+          <Entypo name="controller-play" size={28} color="#fff" />
+        </View>
         <Text style={styles.mainTitle}>{main.title}</Text>
       </TouchableOpacity>
-
-      <FlatList
-        data={others}
-        keyExtractor={(item) => item.youtubeId}
+      <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-  <TouchableOpacity
-    onPress={() => goToDetail(item.youtubeId)}
-    style={styles.smallCard}
-  >
-    <View style={styles.thumbWrapper}>
-      <Image source={{ uri: item.thumbnail }} style={styles.thumb} />
-      <View style={styles.smallPlayButton}>
-        <Entypo name="controller-play" size={18} color="#fff" />
-      </View>
-    </View>
-    <Text style={styles.smallTitle} numberOfLines={2}>{item.title}</Text>
-  </TouchableOpacity>
-)}
-
-      />
+        contentContainerStyle={styles.scrollRow}
+      >
+        {others.map((item) => (
+          <TouchableOpacity
+            key={item.youtubeId}
+            onPress={() => goToDetail(item.youtubeId)}
+            style={styles.smallCard}
+          >
+            <View style={styles.thumbWrapper}>
+              <Image source={{ uri: item.thumbnail }} style={styles.thumb} />
+              <View style={styles.smallPlayButton}>
+                <Entypo name="controller-play" size={18} color="#fff" />
+              </View>
+            </View>
+            <Text style={styles.smallTitle} numberOfLines={2}>{item.title}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -101,7 +98,6 @@ const styles = StyleSheet.create({
   mainImage: {
     width: screenWidth,
     height: 220,
-   
     alignSelf: 'center',
   },
   playButton: {
@@ -121,36 +117,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 10,
   },
+  scrollRow: {
+    paddingHorizontal: 10,
+  },
   smallCard: {
     width: 180,
     marginRight: 10,
   },
-  thumb: {
+  thumbWrapper: {
+    position: 'relative',
     width: '100%',
     height: 100,
-   
+  },
+  thumb: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+  },
+  smallPlayButton: {
+    position: 'absolute',
+    top: 35,
+    left: 75,
+    width: 30,
+    height: 30,
+    backgroundColor: 'rgba(255,0,0,0.8)',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   smallTitle: {
     fontSize: 14,
     marginTop: 5,
   },
-
-  thumbWrapper: {
-  position: 'relative',
-  width: '100%',
-  height: 100,
-},
-
-smallPlayButton: {
-  position: 'absolute',
-  top: 35,
-  left: 75,
-  width: 30,
-  height: 30,
-  backgroundColor: 'rgba(255,0,0,0.8)',
-  borderRadius: 15,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-
 });

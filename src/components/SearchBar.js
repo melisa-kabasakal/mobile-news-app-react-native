@@ -1,30 +1,37 @@
 import React from 'react';
-import { TextInput, StyleSheet } from 'react-native';
+import { TextInput, StyleSheet, Platform } from 'react-native';
 import { useSearch } from '../context/SearchContext';
 import { useTheme } from '../context/ThemeProvider';
 
 const SearchBar = () => {
   const { searchQuery, setSearchQuery } = useSearch();
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   return (
     <TextInput
-      style={[styles.input, { color: theme.text, borderColor: theme.text }]}
+      style={[
+        styles.input,
+        {
+          color: theme.text,
+          borderColor: theme.text,
+          backgroundColor: isDarkMode ? '#222' : '#f2f2f2',
+        },
+      ]}
       placeholder="Arama yapın..."
-      placeholderTextColor={theme.text}
+      placeholderTextColor={isDarkMode ? '#aaa' : '#666'}
       value={searchQuery}
-      onChangeText={setSearchQuery}  
+      onChangeText={setSearchQuery}
+      keyboardAppearance={isDarkMode ? 'dark' : 'light'}
     />
   );
 };
 
 const styles = StyleSheet.create({
   input: {
-    marginTop: 50,
     height: 50,
     borderWidth: 1,
     borderRadius: 10,
-    paddingLeft: 15,
+    paddingHorizontal: 15,
     marginBottom: 10,
   },
 });

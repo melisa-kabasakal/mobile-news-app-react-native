@@ -17,6 +17,8 @@ const KarikaturPreview = () => {
   const { isDarkMode } = useTheme();
   const navigation = useNavigation();
 
+  const IP = '192.168.1.100'; // burayı güncel IP’n ile değiştir
+
   useEffect(() => {
     const fetchKarikatur = async () => {
       try {
@@ -29,8 +31,7 @@ const KarikaturPreview = () => {
         const imageUrl = match?.[1];
 
         if (imageUrl) {
-          const encoded = encodeURIComponent(imageUrl);
-          const proxyUrl = `http://192.168.1.100:3001/proxy-image?url=${encoded}`;
+          const proxyUrl = `https://69a5-88-253-133-120.ngrok-free.app/proxy-image?url=${encodeURIComponent(imageUrl)}`;
 
           setKarikatur({
             image: proxyUrl,
@@ -40,8 +41,8 @@ const KarikaturPreview = () => {
         }
       } catch (error) {
         if (__DEV__) {
-    console.log('Karikatür preview uyarı:', error.message);
-  }
+          console.log('Karikatür preview uyarı:', error.message);
+        }
       } finally {
         setLoading(false);
       }

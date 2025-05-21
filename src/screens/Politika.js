@@ -15,15 +15,36 @@ import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
 import { useNavigation } from '@react-navigation/native';
 
+const PostCard = React.memo(({ item, isDarkMode, navigation }) => (
+  <TouchableOpacity
+    onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
+    style={[
+      styles.postItem,
+      {
+        backgroundColor: isDarkMode ? '#111' : '#fff',
+        borderColor: isDarkMode ? '#333' : '#ddd',
+      },
+    ]}
+  >
+    <Image style={styles.postImage} source={{ uri: item.image }} />
+    <Text style={[styles.postTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
+      {item.title}
+    </Text>
+    <Text style={[styles.postExcerpt, { color: isDarkMode ? '#ccc' : '#444' }]}>
+      {item.excerpt}
+    </Text>
+  </TouchableOpacity>
+));
+
 const Politika = () => {
   const { isDarkMode } = useTheme();
+  const navigation = useNavigation();
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
-  const navigation = useNavigation();
 
   const fetchPosts = async (pageNumber = 1) => {
     try {
@@ -57,38 +78,17 @@ const Politika = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(1);
   }, []);
 
   const handleLoadMore = () => {
     if (!isLoadingMore && hasMore) {
-      setIsLoadingMore(true);
       const nextPage = page + 1;
       setPage(nextPage);
+      setIsLoadingMore(true);
       fetchPosts(nextPage);
     }
   };
-
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
-      style={[
-        styles.postItem,
-        {
-          backgroundColor: isDarkMode ? '#111' : '#fff',
-          borderColor: isDarkMode ? '#333' : '#ddd',
-        },
-      ]}
-    >
-      <Image style={styles.postImage} source={{ uri: item.image }} />
-      <Text style={[styles.postTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
-        {item.title}
-      </Text>
-      <Text style={[styles.postExcerpt, { color: isDarkMode ? '#ccc' : '#444' }]}>
-        {item.excerpt}
-      </Text>
-    </TouchableOpacity>
-  );
 
   if (loading && page === 1) {
     return (
@@ -103,8 +103,11 @@ const Politika = () => {
   return (
     <MainLayout>
       <FlatList
+      style={{ flex: 1 }}
         data={posts}
-        renderItem={renderItem}
+        renderItem={({ item }) => (
+          <PostCard item={item} isDarkMode={isDarkMode} navigation={navigation} />
+        )}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={[
           styles.container,
@@ -122,6 +125,11 @@ const Politika = () => {
             <Footer />
           </>
         }
+        initialNumToRender={6}
+        windowSize={10}
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={true}
       />
     </MainLayout>
   );
@@ -135,6 +143,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
+    flexGrow: 1,
   },
   postItem: {
     marginBottom: 24,

@@ -162,6 +162,7 @@ const fetchKulturNews = async () => {
       <FlatList
   data={news}
   keyExtractor={(item) => item.id.toString()}
+  scrollEnabled={false}
   ListHeaderComponent={() => (
     <View style={styles.header}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Gündem</Text>
@@ -188,6 +189,7 @@ const fetchKulturNews = async () => {
       <FlatList
   data={editorPicks}
   keyExtractor={(item) => item.id.toString()}
+  scrollEnabled={false}
   ListHeaderComponent={() => (
     <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Editörün Seçtikleri</Text>
@@ -229,10 +231,11 @@ const fetchKulturNews = async () => {
 />
 
 
-      {/* Kadın başlığı için  flatlist */}
+{/* Kadın başlığı için  flatlist */}
 <FlatList
   data={kadınNews}
   keyExtractor={(item) => item.id.toString()}
+  scrollEnabled={false}
   ListHeaderComponent={() => (
     <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Kadın</Text>
@@ -278,6 +281,7 @@ const fetchKulturNews = async () => {
       <FlatList
   data={dünyaNews}
   keyExtractor={(item) => item.id.toString()}
+  scrollEnabled={false}
   ListHeaderComponent={() => (
     <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Dünya</Text>
@@ -322,6 +326,7 @@ const fetchKulturNews = async () => {
       <FlatList
   data={kulturNews}
   keyExtractor={(item) => item.id.toString()}
+  scrollEnabled={false}
   ListHeaderComponent={() => (
     <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Kültür</Text>

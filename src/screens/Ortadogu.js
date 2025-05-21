@@ -102,27 +102,29 @@ const Ortadogu = () => {
 
   return (
     <MainLayout>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.7}
-        ListFooterComponent={
-          <>
-            {isLoadingMore && (
-              <View style={{ paddingVertical: 20 }}>
-                <ActivityIndicator color="#aaa" />
-              </View>
-            )}
-            <Footer />
-          </>
-        }
-      />
+     <FlatList
+  style={{ flex: 1 }}
+  data={posts}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.id.toString()}
+  contentContainerStyle={[
+    styles.container,
+    { backgroundColor: isDarkMode ? '#000' : '#fff' },
+  ]}
+  onEndReached={handleLoadMore}
+  onEndReachedThreshold={0.7}
+  ListFooterComponent={
+    <>
+      {isLoadingMore && (
+        <View style={{ paddingVertical: 20 }}>
+          <ActivityIndicator color="#aaa" />
+        </View>
+      )}
+      <Footer />
+    </>
+  }
+/>
+
     </MainLayout>
   );
 };
@@ -135,6 +137,8 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
+    flexGrow: 1,
+    backgroundColor: '#fff',
   },
   postItem: {
     marginBottom: 24,

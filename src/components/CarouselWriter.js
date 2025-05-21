@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,26 @@ import {
   SafeAreaView,
   TouchableOpacity,
   useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { decode } from 'html-entities';
 import { useTheme } from '../context/ThemeProvider';
 import { useNavigation } from '@react-navigation/native';
-import he from 'he';
+
+const CarouselWriterItem = memo(({ item, width, isDarkMode, onPress }) => (
+  <TouchableOpacity
+    style={[styles.item, { width }]}
+    onPress={onPress}
+    activeOpacity={0.9}
+  >
+    <Image source={{ uri: item.image }} style={styles.avatar} />
+    <View style={styles.textGroup}>
+      <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>{item.title}</Text>
+    </View>
+  </TouchableOpacity>
+));
 
 const CarouselWriter = () => {
   const { theme, isDarkMode } = useTheme();
@@ -32,20 +46,20 @@ const CarouselWriter = () => {
       .get('https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts?categories=48&_embed&per_page=10')
       .then((response) => {
         const formattedData = response.data.map((post) => ({
-  id: post.id,
-  title: he.decode(post.title.rendered),
-  link: post.link,
-  content: post.content,
-  image:
-    post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-    'https://via.placeholder.com/300x180.png?text=No+Image',
-  categoryId: post.categories?.[0], 
-}));
+          id: post.id,
+          title: decode(post.title.rendered),
+          link: post.link,
+          content: post.content,
+          image:
+            post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+            'https://via.placeholder.com/300x180.png?text=No+Image',
+          categoryId: post.categories?.[0],
+        }));
 
         setNewsData(formattedData);
       })
       .catch((error) => {
-        console.error('Yazılar alınırken hata oluştu:', error.message);
+        console.warn('Yazılar alınırken hata oluştu:', error.message);
       });
   }, []);
 
@@ -59,17 +73,14 @@ const CarouselWriter = () => {
         });
         setCurrentIndex(nextIndex);
       }
-    }, 4000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [currentIndex, newsData]);
 
   const scrollToIndex = (index) => {
     if (flatListRef.current) {
-      flatListRef.current.scrollToIndex({
-        index,
-        animated: true,
-      });
+      flatListRef.current.scrollToIndex({ index, animated: true });
       setCurrentIndex(index);
     }
   };
@@ -80,39 +91,31 @@ const CarouselWriter = () => {
     setCurrentIndex(newIndex);
   };
 
-  const renderItem = ({ item }) => (
-  <TouchableOpacity
-    style={[styles.item, { width: ITEM_WIDTH }]}
-    onPress={() =>
-    navigation.navigate('AllPostDetail', {
-      postId: item.id,
-    })
+  if (newsData.length === 0) {
+    return <ActivityIndicator size="large" color="#006c9b" style={{ marginVertical: 20 }} />;
   }
-    activeOpacity={0.9}
-  >
-    <Image source={{ uri: item.image }} style={styles.avatar} />
-    <View style={styles.textGroup}>
-      <Text
-        style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}
-      >
-        {item.title}
-      </Text>
-    </View>
-  </TouchableOpacity>
-);
-
 
   return (
     <SafeAreaView style={{ backgroundColor: theme.background }}>
       <View style={styles.wrapper}>
-        <TouchableOpacity style={[styles.arrow, styles.arrowLeft]} onPress={() => prevSlide()}>
-  <Icon name="left" size={24} color={isDarkMode ? '#ffffff' : '#000000'} />
-</TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.arrow, styles.arrowLeft]}
+          onPress={() => scrollToIndex(currentIndex === 0 ? newsData.length - 2 : currentIndex - 2)}
+        >
+          <Icon name="left" size={24} color={isDarkMode ? '#ffffff' : '#000000'} />
+        </TouchableOpacity>
 
         <FlatList
           ref={flatListRef}
           data={newsData}
-          renderItem={renderItem}
+          renderItem={({ item }) => (
+            <CarouselWriterItem
+              item={item}
+              width={ITEM_WIDTH}
+              isDarkMode={isDarkMode}
+              onPress={() => navigation.navigate('AllPostDetail', { postId: item.id })}
+            />
+          )}
           keyExtractor={(item) => item.id.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -120,27 +123,22 @@ const CarouselWriter = () => {
           decelerationRate="fast"
           contentContainerStyle={{ paddingHorizontal: ITEM_MARGIN }}
           onMomentumScrollEnd={handleMomentumScrollEnd}
-          getItemLayout={(data, index) => ({
+          getItemLayout={(_, index) => ({
             length: ITEM_WIDTH + ITEM_MARGIN * 2,
             offset: (ITEM_WIDTH + ITEM_MARGIN * 2) * index,
             index,
           })}
         />
 
-        <TouchableOpacity style={[styles.arrow, styles.arrowRight]} onPress={() => nextSlide()}>
-  <Icon name="right" size={24} color={isDarkMode ? '#ffffff' : '#000000'} />
-</TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.arrow, styles.arrowRight]}
+          onPress={() => scrollToIndex((currentIndex + 2) % newsData.length)}
+        >
+          <Icon name="right" size={24} color={isDarkMode ? '#ffffff' : '#000000'} />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
-
-  function nextSlide() {
-    scrollToIndex((currentIndex + 2) % newsData.length);
-  }
-
-  function prevSlide() {
-    scrollToIndex(currentIndex === 0 ? newsData.length - 2 : currentIndex - 2);
-  }
 };
 
 const styles = StyleSheet.create({
@@ -149,29 +147,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   arrow: {
-  padding: 3,
-  justifyContent: 'center',
-  alignItems: 'center',
-  height:100,
-  backgroundColor: 'rgba(200, 200, 200, 0.4)',
-  margin: 3,
-
-
-  
-},
-
-arrowLeft: {
-
-  borderTopLeftRadius: 8,
-  borderBottomLeftRadius: 8,
-},
-arrowRight: {
-
-  borderTopRightRadius: 8,
-  borderBottomRightRadius: 8,
-  
-},
-
+    padding: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 100,
+    backgroundColor: 'rgba(200, 200, 200, 0.4)',
+    margin: 3,
+  },
+  arrowLeft: {
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  arrowRight: {
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+  },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -195,6 +185,5 @@ arrowRight: {
     flexWrap: 'wrap',
   },
 });
-
 
 export default CarouselWriter;

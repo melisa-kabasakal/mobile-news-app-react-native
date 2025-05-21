@@ -53,7 +53,7 @@ const ArticleDetailScreen = ({ route }) => {
           p: {
             fontSize: 16,
             lineHeight: 24,
-            color: isDarkMode ? '#fff' : '#000',
+            color: isDarkMode ? '#eee' : '#222',
             marginBottom: 12,
           },
           h1: {
@@ -80,7 +80,9 @@ const ArticleDetailScreen = ({ route }) => {
   if (loading) {
     return (
       <MainLayout>
-        <ActivityIndicator size="large" color="#007bff" style={{ marginTop: 40 }} />
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#007bff" />
+        </View>
         <Footer />
       </MainLayout>
     );
@@ -99,7 +101,16 @@ const ArticleDetailScreen = ({ route }) => {
 
   return (
     <MainLayout>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+  style={{ flex: 1 }}
+  contentContainerStyle={[
+    styles.scrollContainer,
+    { backgroundColor: isDarkMode ? '#000' : '#fff' },
+  ]}
+  keyboardShouldPersistTaps="handled"
+  showsVerticalScrollIndicator={false}
+>
+
         {article?.imageUrl && (
           <Image source={{ uri: article.imageUrl }} style={styles.image} />
         )}
@@ -117,14 +128,15 @@ const ArticleDetailScreen = ({ route }) => {
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    padding: 15,
-    paddingBottom: 50,
+    padding: 16,
+    paddingBottom: 80,
+    flexGrow: 1,
   },
   image: {
     width: '100%',
     height: 200,
-    borderRadius: 5,
-    marginBottom: 10,
+    borderRadius: 10,
+    marginBottom: 16,
   },
   title: {
     fontWeight: 'bold',
@@ -138,6 +150,12 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     fontSize: 14,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
   },
 });
 

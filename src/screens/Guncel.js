@@ -90,7 +90,7 @@ const Guncel = () => {
             resizeMode="cover"
           />
         )}
-        <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#333' }]}>
+        <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#333' }]}> 
           {title}
         </Text>
         <Text

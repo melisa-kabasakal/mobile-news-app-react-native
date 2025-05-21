@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  FlatList,
   StyleSheet,
   ActivityIndicator,
   Image,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeProvider';
@@ -69,27 +69,6 @@ const Dunya = () => {
     }
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
-      style={[
-        styles.postItem,
-        {
-          backgroundColor: isDarkMode ? '#111' : '#fff',
-          borderColor: isDarkMode ? '#333' : '#ddd',
-        },
-      ]}
-    >
-      <Image style={styles.postImage} source={{ uri: item.image }} />
-      <Text style={[styles.postTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
-        {item.title}
-      </Text>
-      <Text style={[styles.postExcerpt, { color: isDarkMode ? '#ccc' : '#444' }]}>
-        {item.excerpt}
-      </Text>
-    </TouchableOpacity>
-  );
-
   if (loading && page === 1) {
     return (
       <MainLayout>
@@ -102,27 +81,47 @@ const Dunya = () => {
 
   return (
     <MainLayout>
-      <FlatList
-        data={posts}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.7}
-        ListFooterComponent={
-          <>
-            {isLoadingMore && (
-              <View style={{ paddingVertical: 20 }}>
-                <ActivityIndicator color="#aaa" />
-              </View>
-            )}
-            <Footer />
-          </>
-        }
-      />
+      <ScrollView
+  style={{ flex: 1 }} 
+  contentContainerStyle={[
+    styles.container,
+    { backgroundColor: isDarkMode ? '#000' : '#fff' },
+  ]}
+  onMomentumScrollEnd={handleLoadMore}
+  keyboardShouldPersistTaps="handled" 
+  showsVerticalScrollIndicator={false} 
+>
+
+        {posts.map((item) => (
+          <TouchableOpacity
+            key={item.id}
+            onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
+            style={[
+              styles.postItem,
+              {
+                backgroundColor: isDarkMode ? '#111' : '#fff',
+                borderColor: isDarkMode ? '#333' : '#ddd',
+              },
+            ]}
+          >
+            <Image style={styles.postImage} source={{ uri: item.image }} />
+            <Text style={[styles.postTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
+              {item.title}
+            </Text>
+            <Text style={[styles.postExcerpt, { color: isDarkMode ? '#ccc' : '#444' }]}>
+              {item.excerpt}
+            </Text>
+          </TouchableOpacity>
+        ))}
+
+        {isLoadingMore && (
+          <View style={{ paddingVertical: 20 }}>
+            <ActivityIndicator color="#aaa" />
+          </View>
+        )}
+
+        <Footer />
+      </ScrollView>
     </MainLayout>
   );
 };

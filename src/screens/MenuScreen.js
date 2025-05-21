@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeProvider';
 import MainLayout from '../components/MainLayout';
@@ -30,60 +37,40 @@ const MenuScreen = () => {
   const { isDarkMode } = useTheme();
   const { width } = useWindowDimensions();
 
-  const handleCategoryPress = (category) => {
-  if (
-  category === 'Tümü' ||
-  category === 'Güncel' ||
-  category === 'Politika' ||
-  category === 'Kültür' ||
-  category === 'Kadın' ||
-  category === 'Ekoloji' ||
-  category === 'Emek-Ekonomi' ||
-  category === 'Söyleşi' ||
-  category === 'Yaşam' ||
-  category === 'Forum' ||
-  category === 'Dünya' ||
-  category === 'Ortadoğu' ||
-  category === 'Panorama' ||
-  category === 'Yazarlar' ||
-  category === 'Editörün Seçtikleri' ||
-  category === 'Günün Manşeti' ||
-  category === 'Karikatür'
-  ){
-  navigation.navigate('Anasayfa', {
-    screen: category,
-  });
-} else {
-  navigation.navigate(category);
-}
-};
+  const anasayfaScreens = new Set(categories);
 
+  const handleCategoryPress = (category) => {
+    if (anasayfaScreens.has(category)) {
+      navigation.navigate('Anasayfa', { screen: category });
+    } else {
+      navigation.navigate(category);
+    }
+  };
 
   return (
     <MainLayout>
       <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
-      >
+  style={{ flex: 1 }} 
+  contentContainerStyle={[
+    styles.container,
+    {
+      backgroundColor: isDarkMode ? '#000' : '#fff',
+      flexGrow: 1, 
+    },
+  ]}
+  keyboardShouldPersistTaps="handled"
+  showsVerticalScrollIndicator={false}
+>
         {categories.map((category, index) => (
           <TouchableOpacity
             key={index}
             style={[
               styles.button,
-              {
-                borderColor: isDarkMode ? '#444' : '#ccc',
-              },
+              { borderColor: isDarkMode ? '#444' : '#ccc' },
             ]}
             onPress={() => handleCategoryPress(category)}
           >
-            <Text
-              style={[
-                styles.buttonText,
-                { color: isDarkMode ? '#fff' : '#333' },
-              ]}
-            >
+            <Text style={[styles.buttonText, { color: isDarkMode ? '#fff' : '#333' }]}>
               {category}
             </Text>
           </TouchableOpacity>
@@ -100,6 +87,7 @@ const MenuScreen = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    paddingBottom: 60,
   },
   button: {
     paddingVertical: 16,

@@ -9,7 +9,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeProvider';
-import UserMenuModal from './UserMenuModal'; // doğru konumdaysa
+import UserMenuModal from './UserMenuModal';
 
 const Header = () => {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -25,32 +25,12 @@ const Header = () => {
     }).start();
   }, [isDarkMode]);
 
-  const handleThemeToggle = () => {
-    toggleTheme();
-  };
-
-  const handleUserIconPress = () => {
-    setMenuVisible(true);
-  };
-
-  const handleLogin = () => {
-    setMenuVisible(false);
-    navigation.navigate('Login'); // var olan Login ekranına gider
-  };
-
-  const handleSubscribe = () => {
-    setMenuVisible(false);
-    navigation.navigate('Subscribe'); // kayıt veya form ekranına gider
-  };
-
-  const handlePackages = () => {
-    setMenuVisible(false);
-    navigation.navigate('Packages'); // abonelik paketleri ekranına gider
-  };
+  const handleThemeToggle = () => toggleTheme();
+  const handleUserIconPress = () => setMenuVisible(true);
 
   return (
     <View style={[styles.container, { backgroundColor: isDarkMode ? '#111' : '#fff' }]}>
-      {/* Tema geçişi */}
+      {/* Tema Geçişi */}
       <TouchableOpacity onPress={handleThemeToggle} activeOpacity={0.8}>
         <View style={styles.toggleWrapper}>
           {isDarkMode ? (
@@ -58,7 +38,6 @@ const Header = () => {
           ) : (
             <Icon name="sun" size={14} color="#fff" style={styles.rightIcon} />
           )}
-
           <Animated.View
             style={[
               styles.circle,
@@ -73,25 +52,31 @@ const Header = () => {
 
       {/* Logo */}
       <Image
-        source={{
-          uri: 'https://yeniyasamgazetesi9.com/wp-content/uploads/2022/01/logo-e1643612364952.png',
-        }}
+        source={{ uri: 'https://yeniyasamgazetesi9.com/wp-content/uploads/2022/01/logo-e1643612364952.png' }}
         style={styles.logo}
         resizeMode="contain"
       />
 
-      {/* Kullanıcı ikonu */}
+      {/* Kullanıcı */}
       <TouchableOpacity onPress={handleUserIconPress}>
         <Icon name="user" size={24} color={isDarkMode ? '#fff' : '#000'} />
       </TouchableOpacity>
 
-      {/* Açılır Menü */}
       <UserMenuModal
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
-        onLogin={handleLogin}
-        onSubscribe={handleSubscribe}
-        onPackages={handlePackages}
+        onLogin={() => {
+          setMenuVisible(false);
+          navigation.navigate('Login');
+        }}
+        onSubscribe={() => {
+          setMenuVisible(false);
+          navigation.navigate('Subscribe');
+        }}
+        onPackages={() => {
+          setMenuVisible(false);
+          navigation.navigate('Packages');
+        }}
       />
     </View>
   );
@@ -106,7 +91,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     justifyContent: 'space-between',
     alignItems: 'center',
-    top: 35,
   },
   logo: {
     width: 160,

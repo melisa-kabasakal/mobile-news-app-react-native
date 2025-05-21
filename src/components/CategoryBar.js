@@ -58,7 +58,7 @@ const CategoryBar = () => {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={[styles.scrollWrapper, { width }]}
+      contentContainerStyle={styles.scrollWrapper} // width kaldırıldı
     >
       {content}
     </ScrollView>
@@ -77,11 +77,11 @@ const styles = StyleSheet.create({
   scrollWrapper: {
     paddingVertical: 12,
     paddingHorizontal: 10,
+    flexGrow: 1,
   },
   innerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
   },
   button: {
     paddingHorizontal: 6,

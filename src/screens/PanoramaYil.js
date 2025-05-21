@@ -16,7 +16,6 @@ import he from 'he';
 import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
 
-// Performanslı kart
 const PostCard = React.memo(({ item, isDarkMode, navigation }) => (
   <TouchableOpacity
     onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
@@ -73,7 +72,7 @@ const PanoramaYil = () => {
       console.error(`Panorama ${title} yüklenemedi:`, err);
 
       if (err.response?.status === 400 || err.response?.status === 503) {
-        setHasMore(false); // sayfa sonu olabilir
+        setHasMore(false);
       }
     } finally {
       setLoading(false);
@@ -106,34 +105,36 @@ const PanoramaYil = () => {
 
   return (
     <MainLayout>
-      <FlatList
-        data={posts}
-        renderItem={({ item }) => (
-          <PostCard item={item} isDarkMode={isDarkMode} navigation={navigation} />
-        )}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: isDarkMode ? '#000' : '#fff' },
-        ]}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.7}
-        ListFooterComponent={
-          <>
-            {isLoadingMore && (
-              <View style={{ padding: 20 }}>
-                <ActivityIndicator color="#aaa" />
-              </View>
-            )}
-            <Footer />
-          </>
-        }
-        initialNumToRender={6}
-        windowSize={10}
-        maxToRenderPerBatch={8}
-        updateCellsBatchingPeriod={50}
-        removeClippedSubviews={true}
-      />
+     <FlatList
+  style={{ flex: 1 }}
+  data={posts}
+  renderItem={({ item }) => (
+    <PostCard item={item} isDarkMode={isDarkMode} navigation={navigation} />
+  )}
+  keyExtractor={(item) => item.id.toString()}
+  contentContainerStyle={[
+    styles.container,
+    { backgroundColor: isDarkMode ? '#000' : '#fff' },
+  ]}
+  onEndReached={handleLoadMore}
+  onEndReachedThreshold={0.7}
+  ListFooterComponent={
+    <>
+      {isLoadingMore && (
+        <View style={{ padding: 20 }}>
+          <ActivityIndicator color="#aaa" />
+        </View>
+      )}
+      <Footer />
+    </>
+  }
+  initialNumToRender={6}
+  windowSize={10}
+  maxToRenderPerBatch={8}
+  updateCellsBatchingPeriod={50}
+  removeClippedSubviews={true}
+/>
+
     </MainLayout>
   );
 };
@@ -146,6 +147,7 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
+    flexGrow: 1,
   },
   card: {
     marginBottom: 20,

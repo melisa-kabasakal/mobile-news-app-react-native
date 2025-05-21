@@ -63,9 +63,11 @@ const HomeStack = () => (
 <Stack.Screen name="Yazarlar" component={WritersScreen} />
 <Stack.Screen name='Editörün Seçtikleri' component={EditorunSectikleri} />
 <Stack.Screen name='Günün Manşeti' component={GununManseti} />
-<Stack.Screen name='Karikatür' component={KarikaturScreen} />
+<Stack.Screen name='KarikaturScreen' component={KarikaturScreen} />
 <Stack.Screen name="Login" component={LoginScreen} />
 <Stack.Screen name="WriterPosts" component={WriterPosts} />
+<Stack.Screen name="Karikatür" component={KarikaturScreen} />
+
 <Stack.Screen name="VideoDetail" component={VideoDetailScreen} />
 
   </Stack.Navigator>

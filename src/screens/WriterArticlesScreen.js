@@ -22,7 +22,7 @@ const WriterArticlesScreen = ({ route, navigation }) => {
 
   const [articles, setArticles] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(999); 
+  const [totalPages, setTotalPages] = useState(999);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
@@ -86,6 +86,40 @@ const WriterArticlesScreen = ({ route, navigation }) => {
     );
   }
 
+  const renderItem = ({ item }) => (
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: isDarkMode ? '#222' : '#f0f0f0' },
+      ]}
+    >
+      {item.imageUrl && (
+        <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      )}
+      <Text
+        style={[
+          styles.title,
+          { color: isDarkMode ? '#fff' : '#000' },
+        ]}
+      >
+        {decode(item.title.rendered)}
+      </Text>
+      <RenderHtml
+        contentWidth={width}
+        source={{ html: item.excerpt.rendered }}
+        tagsStyles={{
+          p: {
+            fontSize: 14,
+            color: isDarkMode ? '#ddd' : '#333',
+          },
+        }}
+      />
+      <TouchableOpacity onPress={() => handlePress(item.id)}>
+        <Text style={styles.readMore}>Yazının Tamamı</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <MainLayout>
       <FlatList
@@ -93,6 +127,7 @@ const WriterArticlesScreen = ({ route, navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
+        renderItem={renderItem}
         ListFooterComponent={
           <>
             {isFetching && (
@@ -101,40 +136,11 @@ const WriterArticlesScreen = ({ route, navigation }) => {
             <Footer />
           </>
         }
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.card,
-              { backgroundColor: isDarkMode ? '#222' : '#f0f0f0' },
-            ]}
-          >
-            {item.imageUrl && (
-              <Image source={{ uri: item.imageUrl }} style={styles.image} />
-            )}
-            <Text
-              style={[
-                styles.title,
-                { color: isDarkMode ? '#fff' : '#000' },
-              ]}
-            >
-              {decode(item.title.rendered)}
-            </Text>
-            <RenderHtml
-              contentWidth={width}
-              source={{ html: item.excerpt.rendered }}
-
-              tagsStyles={{
-                p: {
-                  fontSize: 14,
-                  color: isDarkMode ? '#ddd' : '#333',
-                },
-              }}
-            />
-            <TouchableOpacity onPress={() => handlePress(item.id)}>
-              <Text style={styles.readMore}>Yazının Tamamı</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        initialNumToRender={6}
+        windowSize={10}
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={false}
       />
     </MainLayout>
   );

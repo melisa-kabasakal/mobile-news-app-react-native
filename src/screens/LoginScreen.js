@@ -1,42 +1,85 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import MainLayout from '../components/MainLayout';
+import { useTheme } from '../context/ThemeProvider';
 
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const { isDarkMode } = useTheme();
 
   const handleLogin = () => {
-    Alert.alert('Başarılı');
+    Alert.alert('Giriş Başarılı');
     setUsername('');
     setPassword('');
   };
 
   return (
     <MainLayout>
-      <View style={styles.container}>
-        <Text style={styles.title}>Giriş Yap</Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+  style={{ flex: 1 }} 
+  contentContainerStyle={[
+    styles.container,
+    { backgroundColor: isDarkMode ? '#000' : '#fff' },
+  ]}
+  keyboardShouldPersistTaps="handled"
+>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Kullanıcı Adı"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-        />
+          <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
+            Giriş Yap
+          </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Şifre"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+          <TextInput
+            style={[
+              styles.input,
+              {
+                color: isDarkMode ? '#fff' : '#000',
+                backgroundColor: isDarkMode ? '#111' : '#fff',
+                borderColor: isDarkMode ? '#333' : '#ccc',
+              },
+            ]}
+            placeholder="Kullanıcı Adı"
+            placeholderTextColor={isDarkMode ? '#aaa' : '#666'}
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+          />
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Giriş Yap</Text>
-        </TouchableOpacity>
-      </View>
+          <TextInput
+            style={[
+              styles.input,
+              {
+                color: isDarkMode ? '#fff' : '#000',
+                backgroundColor: isDarkMode ? '#111' : '#fff',
+                borderColor: isDarkMode ? '#333' : '#ccc',
+              },
+            ]}
+            placeholder="Şifre"
+            placeholderTextColor={isDarkMode ? '#aaa' : '#666'}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Giriş Yap</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </MainLayout>
   );
 };
@@ -45,19 +88,19 @@ export default LoginScreen;
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
+    justifyContent: 'center',
     padding: 20,
-    gap: 18,
+    gap: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     alignSelf: 'center',
-    marginVertical: 20,
+    marginBottom: 20,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
     padding: 14,
     borderRadius: 10,
   },
@@ -66,6 +109,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
+    marginTop: 10,
   },
   buttonText: {
     color: '#fff',

@@ -1,38 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Image, FlatList, useWindowDimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  FlatList,
+  useWindowDimensions,
+} from 'react-native';
 import axios from 'axios';
 import { decode } from 'html-entities';
 import { useTheme } from '../context/ThemeProvider';
 import Footer from '../components/Footer';
 import MainLayout from '../components/MainLayout';
 
-
 const SingleNewsScreen = ({ route }) => {
   const { postId } = route.params;
   const { theme } = useTheme();
+  const { width } = useWindowDimensions();
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const { width } = useWindowDimensions();
-
   const fetchPostDetail = async () => {
     try {
       const response = await axios.get(
-        `https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts/${postId}`
+        `https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts/${postId}?_embed`
       );
-      const post = response.data;
-      if (post.featured_media) {
-        try {
-          const mediaResponse = await axios.get(
-            `https://yeniyasamgazetesi9.com/wp-json/wp/v2/media/${post.featured_media}`
-          );
-          post.featured_media_url = mediaResponse.data.source_url;
-        } catch (err) {
-          post.featured_media_url = null;
-        }
-      }
-      setPost(post);
+      const data = response.data;
+
+      const image =
+        data._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+        'https://via.placeholder.com/300x180.png?text=No+Image';
+
+      const formatted = {
+        ...data,
+        featured_media_url: image,
+      };
+
+      setPost(formatted);
     } catch (err) {
       setError('Haber detayları alınırken bir hata oluştu.');
       setTimeout(() => setError(null), 3000);
@@ -46,64 +53,65 @@ const SingleNewsScreen = ({ route }) => {
   }, [postId]);
 
   if (loading) {
-    return <ActivityIndicator size="large" style={styles.loader} />;
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#006c9b" />
+      </View>
+    );
   }
 
   return (
     <MainLayout>
-    <FlatList
-      data={post ? [post] : []}
-      keyExtractor={(item) => item.id.toString()}
-      renderItem={({ item }) => (
-        <View style={[styles.container, { backgroundColor: theme.background }]}>
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={[styles.errorText, { color: theme.text }]}>{error}</Text>
+      <FlatList
+        data={post ? [post] : []}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={[styles.container, { backgroundColor: theme.background }]}>
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={[styles.errorText, { color: theme.text }]}>{error}</Text>
+              </View>
+            )}
+            {item.featured_media_url && (
+              <Image source={{ uri: item.featured_media_url }} style={styles.image} />
+            )}
+            <Text style={[styles.title, { color: theme.text }]}>{decode(item.title.rendered)}</Text>
+            <Text style={[styles.date, { color: theme.secondaryText }]}>
+              {new Date(item.date).toLocaleDateString()}
+            </Text>
+            <Text style={[styles.body, { color: theme.text }]}>
+              {decode(item.content.rendered.replace(/<\/?[^>]+(>|$)/g, ''))}
+            </Text>
+            <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
+              <Footer />
             </View>
-          )}
-          {item.featured_media_url && (
-            <Image source={{ uri: item.featured_media_url }} style={styles.image} />
-          )}
-          <Text style={[styles.title, { color: theme.text }]}>{decode(item.title.rendered)}</Text>
-          <Text style={[styles.date, { color: theme.secondaryText }]}>
-            {new Date(item.date).toLocaleDateString()}
-          </Text>
-          <Text style={[styles.body, { color: theme.text }]}>
-            {decode(item.content.rendered.replace(/<\/?[^>]+(>|$)/g, ""))}
-          </Text>
-          <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
-          <Footer />
-        </View>
-        </View>
-        
-        
-      )}
-    />
+          </View>
+        )}
+        contentContainerStyle={{ padding: 12 }}
+        style={{ flex: 1 }}
+      />
     </MainLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-  },
   loader: {
     flex: 1,
     justifyContent: 'center',
   },
-  content: {
-    marginBottom: 20,
+  container: {
+    flex: 1,
   },
   image: {
     width: '100%',
     height: 250,
     borderRadius: 8,
+    marginBottom: 12,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginVertical: 10,
+    marginBottom: 8,
   },
   date: {
     fontSize: 14,
@@ -111,11 +119,13 @@ const styles = StyleSheet.create({
   },
   body: {
     fontSize: 16,
+    lineHeight: 24,
   },
   errorContainer: {
     backgroundColor: '#ffe5e5',
     padding: 10,
     alignItems: 'center',
+    marginBottom: 10,
   },
   errorText: {
     fontSize: 16,

@@ -6,31 +6,62 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Platform,
+  BackHandler,
 } from 'react-native';
 import * as Linking from 'expo-linking';
+import { useTheme } from '../context/ThemeProvider';
+import { useEffect } from 'react';
 
 const UserMenuModal = ({ visible, onClose }) => {
+  const { isDarkMode } = useTheme();
+
+  useEffect(() => {
+    if (Platform.OS === 'android' && visible) {
+      const backAction = () => {
+        onClose();
+        return true;
+      };
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+      return () => backHandler.remove();
+    }
+  }, [visible]);
+
+  const openSafeURL = async (url) => {
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      Linking.openURL(url);
+    } else {
+      console.warn('URL açılamıyor:', url);
+    }
+  };
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <Pressable style={styles.overlay} onPress={onClose}>
-        <View style={styles.menuContainer}>
+        <View
+          style={[
+            styles.menuContainer,
+            { backgroundColor: isDarkMode ? '#111' : '#fff' },
+          ]}
+        >
           <TouchableOpacity
             style={styles.menuButton}
-            onPress={() => Linking.openURL('https://eyeniyasam.com/epanel/')}
+            onPress={() => openSafeURL('https://eyeniyasam.com/epanel/')}
           >
             <Text style={styles.menuText}>Giriş Yap</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.menuButton}
-            onPress={() => Linking.openURL('https://eyeniyasam.com/')}
+            onPress={() => openSafeURL('https://eyeniyasam.com/')}
           >
             <Text style={styles.menuText}>Abone Ol</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.menuButton}
-            onPress={() => Linking.openURL('https://eyeniyasam.com/urunler/')}
+            onPress={() => openSafeURL('https://eyeniyasam.com/urunler/')}
           >
             <Text style={styles.menuText}>Abonelik Paketleri</Text>
           </TouchableOpacity>
@@ -49,7 +80,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   menuContainer: {
-    backgroundColor: '#fff',
     padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
