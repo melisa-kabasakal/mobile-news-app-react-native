@@ -50,6 +50,7 @@ export default AboneBanner;
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    marginBottom:20,
     
   },
   image: {

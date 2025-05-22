@@ -16,7 +16,7 @@ import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
 
 const WriterArticlesScreen = ({ route, navigation }) => {
-  const writerLink = route?.params?.writerLink;
+  const { writerLink, writerId } = route?.params ?? {};
   const { isDarkMode } = useTheme();
   const { width } = useWindowDimensions();
 
@@ -29,7 +29,17 @@ const WriterArticlesScreen = ({ route, navigation }) => {
 
   const fetchArticles = async (page) => {
     try {
-      const response = await fetch(`${writerLink}&page=${page}&_embed`);
+      let url = '';
+
+      if (writerId) {
+        url = `https://yeniyasamgazetesi9.com/wp-json/wp/v2/posts?author=${writerId}&page=${page}&_embed`;
+      } else if (writerLink) {
+        url = `${writerLink}&page=${page}&_embed`;
+      } else {
+        throw new Error('writerId veya writerLink bulunamadı');
+      }
+
+      const response = await fetch(url);
       if (!response.ok) throw new Error('API hatası');
 
       const data = await response.json();
@@ -41,8 +51,7 @@ const WriterArticlesScreen = ({ route, navigation }) => {
 
       const enhanced = data.map((article) => ({
         ...article,
-        imageUrl:
-          article._embedded?.['wp:featuredmedia']?.[0]?.source_url ?? null,
+        imageUrl: article._embedded?.['wp:featuredmedia']?.[0]?.source_url ?? null,
       }));
 
       setArticles((prev) => [...prev, ...enhanced]);
@@ -56,10 +65,10 @@ const WriterArticlesScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    if (writerLink) {
+    if (writerId || writerLink) {
       fetchArticles(currentPage);
     }
-  }, [writerLink, currentPage]);
+  }, [writerId, writerLink, currentPage]);
 
   const handleLoadMore = () => {
     if (!isFetching && currentPage < totalPages) {
@@ -87,21 +96,9 @@ const WriterArticlesScreen = ({ route, navigation }) => {
   }
 
   const renderItem = ({ item }) => (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: isDarkMode ? '#222' : '#f0f0f0' },
-      ]}
-    >
-      {item.imageUrl && (
-        <Image source={{ uri: item.imageUrl }} style={styles.image} />
-      )}
-      <Text
-        style={[
-          styles.title,
-          { color: isDarkMode ? '#fff' : '#000' },
-        ]}
-      >
+    <View style={[styles.card, { backgroundColor: isDarkMode ? '#222' : '#f0f0f0' }]}>
+      {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.image} />}
+      <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>
         {decode(item.title.rendered)}
       </Text>
       <RenderHtml

@@ -25,7 +25,7 @@ const VideoNewsScreen = ({ navigation }) => {
   const fetchVideos = async () => {
     try {
       const res = await axios.get('https://69a5-88-253-133-120.ngrok-free.app/video-playlist');
-      console.log('📦 Tüm gelen video verisi:', res.data);
+      console.log('Tüm gelen video verisi:', res.data);
       setVideos(res.data);
     } catch (error) {
       console.error('Video verisi alınamadı:', error.message);

@@ -69,11 +69,11 @@ const PanoramaYil = () => {
         setHasMore(false);
       }
     } catch (err) {
-      console.error(`Panorama ${title} yüklenemedi:`, err);
-
-      if (err.response?.status === 400 || err.response?.status === 503) {
-        setHasMore(false);
+      if (__DEV__) {
+        console.log(`Panorama ${title} yüklenemedi (sessiz bastırıldı).`);
       }
+
+      setHasMore(false);
     } finally {
       setLoading(false);
       setIsLoadingMore(false);
@@ -103,38 +103,54 @@ const PanoramaYil = () => {
     );
   }
 
+  if (posts.length === 0) {
+    return (
+      <MainLayout>
+        <View style={styles.noContent}>
+          <Text style={{ color: isDarkMode ? '#fff' : '#000', fontSize: 16 }}>
+            Şu anda içerik bulunamadı.
+          </Text>
+          <Image
+            source={{ uri: 'https://cdn-icons-png.flaticon.com/512/4076/4076500.png' }}
+            style={{ width: 100, height: 100, marginTop: 20, opacity: 0.5 }}
+          />
+          <Footer />
+        </View>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
-     <FlatList
-  style={{ flex: 1 }}
-  data={posts}
-  renderItem={({ item }) => (
-    <PostCard item={item} isDarkMode={isDarkMode} navigation={navigation} />
-  )}
-  keyExtractor={(item) => item.id.toString()}
-  contentContainerStyle={[
-    styles.container,
-    { backgroundColor: isDarkMode ? '#000' : '#fff' },
-  ]}
-  onEndReached={handleLoadMore}
-  onEndReachedThreshold={0.7}
-  ListFooterComponent={
-    <>
-      {isLoadingMore && (
-        <View style={{ padding: 20 }}>
-          <ActivityIndicator color="#aaa" />
-        </View>
-      )}
-      <Footer />
-    </>
-  }
-  initialNumToRender={6}
-  windowSize={10}
-  maxToRenderPerBatch={8}
-  updateCellsBatchingPeriod={50}
-  removeClippedSubviews={true}
-/>
-
+      <FlatList
+        style={{ flex: 1 }}
+        data={posts}
+        renderItem={({ item }) => (
+          <PostCard item={item} isDarkMode={isDarkMode} navigation={navigation} />
+        )}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: isDarkMode ? '#000' : '#fff' },
+        ]}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.7}
+        ListFooterComponent={
+          <>
+            {isLoadingMore && (
+              <View style={{ padding: 20 }}>
+                <ActivityIndicator color="#aaa" />
+              </View>
+            )}
+            <Footer />
+          </>
+        }
+        initialNumToRender={6}
+        windowSize={10}
+        maxToRenderPerBatch={8}
+        updateCellsBatchingPeriod={50}
+        removeClippedSubviews={true}
+      />
     </MainLayout>
   );
 };
@@ -144,6 +160,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  noContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
   },
   container: {
     padding: 16,

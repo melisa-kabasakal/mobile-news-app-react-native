@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   menuButton: {
-    backgroundColor: '#d00000',
+    backgroundColor: '#d71920',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',

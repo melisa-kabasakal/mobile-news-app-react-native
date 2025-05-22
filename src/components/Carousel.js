@@ -70,21 +70,12 @@ const Carousel = () => {
   }, [newsData.length]);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('NewsDetail', { postId: item.id })}
-      style={[styles.card, { width: windowWidth }]}
-    >
+  <TouchableOpacity
+    onPress={() => navigation.navigate('NewsDetail', { postId: item.id })}
+    style={[styles.card, { width: windowWidth }]}
+  >
+    <View style={styles.imageWrapper}>
       <Image source={{ uri: item.image }} style={styles.image} />
-      <Text style={[styles.title, { color: theme.text }]}>{item.title}</Text>
-    </TouchableOpacity>
-  );
-
-  if (newsData.length === 0) {
-    return <Text style={styles.loadingText}>Yükleniyor...</Text>;
-  }
-
-  return (
-    <SafeAreaView style={styles.safe}>
       <View style={styles.dotsContainer}>
         {newsData.map((_, index) => (
           <View
@@ -93,7 +84,18 @@ const Carousel = () => {
           />
         ))}
       </View>
+    </View>
+    <Text style={[styles.title, { color: theme.text }]}>{item.title}</Text>
+  </TouchableOpacity>
+);
 
+
+  if (newsData.length === 0) {
+    return <Text style={styles.loadingText}>Yükleniyor...</Text>;
+  }
+
+  return (
+    <SafeAreaView style={styles.safe}>
       <FlatList
         ref={flatListRef}
         data={newsData}
@@ -119,38 +121,57 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   card: {
-   
     height: 400,
     justifyContent: 'start',
     alignItems: 'center',
   },
   image: {
     width: '100%',
-    height: 270,
+    height: 280,
     resizeMode: 'cover',
   },
-  title: {
-    fontSize: 18,
+    title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'start',
+    textAlign: 'left',
     paddingHorizontal: 10,
+    marginTop: 5,
+    width: '100%',
+    paddingVertical: 8,
+   
   },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    top: 270,
-    zIndex: 1,
-  },
-  dot: {
-    width: 11,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ccc',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: '#006c9b',
-  },
+
+imageWrapper: {
+  width: '100%',
+  height: 280,
+  position: 'relative',
+},
+
+dotsContainer: {
+  position: 'absolute',
+  bottom: 12, 
+  left: 0,
+  right: 0,
+  flexDirection: 'row',
+  justifyContent: 'center',
+  zIndex: 2,
+},
+dot: {
+  width: 12,
+  height: 9,
+  borderRadius: 6,
+  backgroundColor: '#ccc',
+  marginHorizontal: 6,
+  opacity: 0.8,
+},
+
+activeDot: {
+  width: 15,
+  height: 9,
+  borderRadius: 6,
+  backgroundColor: '#006c9b',
+  opacity: 1,
+},
   loadingText: {
     fontSize: 18,
     fontWeight: 'bold',

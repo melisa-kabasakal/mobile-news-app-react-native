@@ -13,10 +13,12 @@ import { decode } from 'html-entities';
 import { useTheme } from '../context/ThemeProvider';
 import Footer from '../components/Footer';
 import MainLayout from '../components/MainLayout';
+import RenderHtml from 'react-native-render-html';
+import { getRenderHtmlStyles } from '../utils/renderHtmlStyles';
 
 const SingleNewsScreen = ({ route }) => {
   const { postId } = route.params;
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const { width } = useWindowDimensions();
 
   const [post, setPost] = useState(null);
@@ -75,13 +77,20 @@ const SingleNewsScreen = ({ route }) => {
             {item.featured_media_url && (
               <Image source={{ uri: item.featured_media_url }} style={styles.image} />
             )}
-            <Text style={[styles.title, { color: theme.text }]}>{decode(item.title.rendered)}</Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              {decode(item.title.rendered)}
+            </Text>
             <Text style={[styles.date, { color: theme.secondaryText }]}>
               {new Date(item.date).toLocaleDateString()}
             </Text>
-            <Text style={[styles.body, { color: theme.text }]}>
-              {decode(item.content.rendered.replace(/<\/?[^>]+(>|$)/g, ''))}
-            </Text>
+
+            <RenderHtml
+              contentWidth={width}
+              source={{ html: item.content.rendered }}
+              tagsStyles={getRenderHtmlStyles(isDarkMode)}
+              renderersProps={{ img: { enableExperimentalPercentWidth: true } }}
+            />
+
             <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
               <Footer />
             </View>
@@ -116,10 +125,6 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     marginBottom: 10,
-  },
-  body: {
-    fontSize: 16,
-    lineHeight: 24,
   },
   errorContainer: {
     backgroundColor: '#ffe5e5',

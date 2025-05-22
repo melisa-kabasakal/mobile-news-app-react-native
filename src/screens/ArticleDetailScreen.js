@@ -15,6 +15,8 @@ import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
 import { decode } from 'he';
 
+import { getRenderHtmlStyles } from '../utils/renderHtmlStyles';
+
 const ArticleDetailScreen = ({ route }) => {
   const { articleId } = route.params;
   const { width } = useWindowDimensions();
@@ -49,25 +51,8 @@ const ArticleDetailScreen = ({ route }) => {
       <RenderHtml
         contentWidth={width}
         source={{ html: article.content.rendered }}
-        tagsStyles={{
-          p: {
-            fontSize: 16,
-            lineHeight: 24,
-            color: isDarkMode ? '#eee' : '#222',
-            marginBottom: 12,
-          },
-          h1: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: isDarkMode ? '#fff' : '#000',
-            marginBottom: 12,
-          },
-          img: {
-            marginVertical: 15,
-            width: '100%',
-            height: 'auto',
-          },
-        }}
+        tagsStyles={getRenderHtmlStyles(isDarkMode)}
+
         renderersProps={{
           img: {
             enableExperimentalPercentWidth: true,

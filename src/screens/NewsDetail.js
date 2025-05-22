@@ -12,33 +12,18 @@ import axios from 'axios';
 import { useTheme } from '../context/ThemeProvider';
 import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
+import RenderHtml from 'react-native-render-html';
+import { decode } from 'html-entities';
+import { getRenderHtmlStyles } from '../utils/renderHtmlStyles';
 
 const NewsDetail = ({ route }) => {
   const { postId } = route.params;
-  const { theme } = useTheme();
+  const { theme, isDarkMode } = useTheme();
+  const { width } = useWindowDimensions();
 
   const [newsDetail, setNewsDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { width } = useWindowDimensions();
-
-  const cleanText = (html) => {
-    let text = html.replace(/<[^>]*>/g, '');
-
-    const entities = {
-      '&#8220;': '"', '&#8221;': '"', '&#8216;': "'", '&#8217;': "'",
-      '&#8230;': '…', '&nbsp;': ' ', '&amp;': '&', '&quot;': '"',
-      '&lt;': '<', '&gt;': '>', '&#039;': "'", '&#8211;': '–',
-      '&#8212;': '—', '&#8242;': "'", '&#8243;': '"', '&#160;': ' '
-    };
-
-    for (const entity in entities) {
-      const regex = new RegExp(entity, 'g');
-      text = text.replace(regex, entities[entity]);
-    }
-
-    return text.trim();
-  };
 
   useEffect(() => {
     const fetchNewsDetail = async () => {
@@ -89,16 +74,20 @@ const NewsDetail = ({ route }) => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <Image source={{ uri: newsDetail.image }} style={styles.image} />
 
         <Text style={[styles.title, { color: theme.text }]}>
-          {cleanText(newsDetail.title)}
+          {decode(newsDetail.title)}
         </Text>
 
-        <Text style={[styles.content, { color: theme.text }]}>
-          {cleanText(newsDetail.content)}
-        </Text>
+        <RenderHtml
+          contentWidth={width}
+          source={{ html: newsDetail.content }}
+          tagsStyles={getRenderHtmlStyles(isDarkMode)}
+          renderersProps={{ img: { enableExperimentalPercentWidth: true } }}
+        />
 
         <View style={{ width, alignSelf: 'center', marginTop: 50 }}>
           <Footer />
@@ -131,10 +120,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 12,
-  },
-  content: {
-    fontSize: 16,
-    lineHeight: 24,
   },
   errorContainer: {
     flex: 1,

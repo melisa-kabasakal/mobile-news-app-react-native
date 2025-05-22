@@ -23,7 +23,7 @@ const JinDergiPreview = () => {
       <Text
         style={[
           styles.header,
-          { backgroundColor: '#ff0000', color: '#fff' },
+          { backgroundColor: '#d71920', color: '#fff' },
         ]}
       >
         JIN Dergi
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     padding: 10,
-    marginBottom: 12,
+    marginBottom: 15,
   },
   image: {
     height: 500,

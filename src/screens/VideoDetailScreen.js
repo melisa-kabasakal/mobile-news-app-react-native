@@ -1,32 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, Text, Dimensions, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useTheme } from '../context/ThemeProvider';
+import { useIsFocused } from '@react-navigation/native';
 import MainLayout from '../components/MainLayout';
-import Footer from '../components/Footer';
+
 
 const VideoDetailScreen = ({ route }) => {
   const { youtubeId } = route?.params || {};
-  const embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+  const embedUrl = `https://www.youtube.com/embed/${youtubeId}?playsinline=0`;
   const { isDarkMode } = useTheme();
-
-  const [orientation, setOrientation] = useState('PORTRAIT');
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    const onChange = ({ orientationInfo }) => {
-      const o = orientationInfo.orientation;
-      setOrientation(o === 3 || o === 4 ? 'LANDSCAPE' : 'PORTRAIT');
-    };
-
-    ScreenOrientation.addOrientationChangeListener(onChange);
-    ScreenOrientation.unlockAsync(); // Kullanıcının döndürmesine izin ver
-
-    return () => {
-      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
-      ScreenOrientation.removeOrientationChangeListeners();
-    };
-  }, []);
+    if (isFocused) {
+      ScreenOrientation.unlockAsync();
+    } else {
+      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP); 
+    }
+  }, [isFocused]);
 
   if (!youtubeId) {
     return (
@@ -38,8 +31,7 @@ const VideoDetailScreen = ({ route }) => {
     );
   }
 
-  const { width, height } = Dimensions.get('window');
-  const videoHeight = orientation === 'LANDSCAPE' ? height : 300;
+  const { width } = Dimensions.get('window');
 
   return (
     <MainLayout>
@@ -52,7 +44,7 @@ const VideoDetailScreen = ({ route }) => {
           mediaPlaybackRequiresUserAction={Platform.OS === 'android' ? false : undefined}
           style={{ flex: 1 }}
         />
-        {orientation === 'PORTRAIT' && <Footer />}
+       
       </View>
     </MainLayout>
   );

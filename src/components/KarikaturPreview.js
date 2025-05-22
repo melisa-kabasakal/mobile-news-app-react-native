@@ -17,7 +17,7 @@ const KarikaturPreview = () => {
   const { isDarkMode } = useTheme();
   const navigation = useNavigation();
 
-  const IP = '192.168.1.100'; // burayı güncel IP’n ile değiştir
+  const IP = '192.168.1.100';
 
   useEffect(() => {
     const fetchKarikatur = async () => {
@@ -78,9 +78,9 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 22,
     fontWeight: 'bold',
-    backgroundColor: '#ff0000',
+    backgroundColor: '#d71920',
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   image: {
     width: '100%',

@@ -37,20 +37,32 @@ const CategoryBar = () => {
       ]}
     >
       {categories.map((item, index) => (
-        <React.Fragment key={item.title}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate(item.route)}
-            style={styles.button}
-          >
-            <Text style={[styles.text, { color: isDarkMode ? '#fff' : '#000' }]}>
-              {item.title}
-            </Text>
-          </TouchableOpacity>
-          {index < categories.length - 1 && (
-            <Text style={styles.separator}>|</Text>
-          )}
-        </React.Fragment>
-      ))}
+  <React.Fragment key={item.title}>
+    <TouchableOpacity
+      onPress={() => navigation.navigate(item.route)}
+      style={styles.button}
+    >
+      <Text style={[styles.text, { color: isDarkMode ? '#fff' : '#000' }]}>
+        {item.title}
+      </Text>
+    </TouchableOpacity>
+    {index < categories.length - 1 && (
+      <Text
+        style={{
+          fontSize: 14,
+          marginHorizontal: 4,
+          alignSelf: 'center',
+          color: isDarkMode ? 'rgba(209, 209, 209, 0.4)' : '#d1d1d1', 
+           backgroundColor: 'transparent',
+        }}
+      >
+        |
+      </Text>
+    )}
+  </React.Fragment>
+))}
+
+
     </View>
   );
 
@@ -58,7 +70,7 @@ const CategoryBar = () => {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.scrollWrapper} // width kaldırıldı
+      contentContainerStyle={styles.scrollWrapper}
     >
       {content}
     </ScrollView>
@@ -90,11 +102,5 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     fontWeight: 'bold',
-  },
-  separator: {
-    fontSize: 14,
-    marginHorizontal: 4,
-    color: '#d1d1d1',
-    alignSelf: 'center',
   },
 });

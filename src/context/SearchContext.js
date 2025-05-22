@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
-import debounce from 'lodash.debounce'; // bunu kurduğuna emin ol: npm i lodash.debounce
+import debounce from 'lodash.debounce';
 
 const SearchContext = createContext();
 

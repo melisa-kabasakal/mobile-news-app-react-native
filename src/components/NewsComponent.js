@@ -191,7 +191,7 @@ const fetchKulturNews = async () => {
   keyExtractor={(item) => item.id.toString()}
   scrollEnabled={false}
   ListHeaderComponent={() => (
-    <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
+    <View style={[styles.header, { backgroundColor: '#d71920'}]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Editörün Seçtikleri</Text>
     </View>
   )}
@@ -237,7 +237,7 @@ const fetchKulturNews = async () => {
   keyExtractor={(item) => item.id.toString()}
   scrollEnabled={false}
   ListHeaderComponent={() => (
-    <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
+    <View style={[styles.header, { backgroundColor: '#d71920' }]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Kadın</Text>
     </View>
   )}
@@ -283,7 +283,7 @@ const fetchKulturNews = async () => {
   keyExtractor={(item) => item.id.toString()}
   scrollEnabled={false}
   ListHeaderComponent={() => (
-    <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
+    <View style={[styles.header, { backgroundColor: '#d71920'}]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Dünya</Text>
     </View>
   )}
@@ -328,7 +328,7 @@ const fetchKulturNews = async () => {
   keyExtractor={(item) => item.id.toString()}
   scrollEnabled={false}
   ListHeaderComponent={() => (
-    <View style={[styles.header, { backgroundColor: '#ff0000' }]}>
+    <View style={[styles.header, { backgroundColor: '#d71920' }]}>
       <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Kültür</Text>
     </View>
   )}
@@ -396,9 +396,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   header: {
-    backgroundColor: '#ff0000',
+    backgroundColor: '#d71920',
+
     padding: 10,
-    marginBottom: 5,
+    marginBottom: 2,
   },
   headerText: {
     fontSize: 20,

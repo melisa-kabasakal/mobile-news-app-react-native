@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 22,
     fontWeight: 'bold',
-    backgroundColor: '#ff0000',
+    backgroundColor: '#d71920',
     padding: 10,
-    marginBottom: 10,
+    marginBottom: 6,
   },
   previewImage: {
     width: '100%',

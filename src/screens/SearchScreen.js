@@ -49,9 +49,17 @@ const SearchScreen = () => {
 
               {/* YAZARLAR */}
               {Array.isArray(results.writers) && results.writers.length > 0 && (
-                <Section title="Yazarlar" items={results.writers} onItemPress={() => { }}
-                  renderLabel={(writer) => writer.name} theme={theme} />
-              )}
+  <Section
+    title="Yazarlar"
+    items={results.writers}
+    onItemPress={(writer) =>
+      navigation.navigate('WriterArticlesScreen', { writerId: writer.id })
+    }
+    renderLabel={(writer) => writer.name}
+    theme={theme}
+  />
+)}
+
 
               {/* VİDEOLAR */}
               {Array.isArray(results.videos) && results.videos.length > 0 && (

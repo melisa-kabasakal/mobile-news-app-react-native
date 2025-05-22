@@ -96,7 +96,7 @@ const CarouselWriter = () => {
   }
 
   return (
-    <SafeAreaView style={{ backgroundColor: theme.background }}>
+    <SafeAreaView style={{ backgroundColor: theme.background , marginTop: -15, marginBottom:20 }}>
       <View style={styles.wrapper}>
         <TouchableOpacity
           style={[styles.arrow, styles.arrowLeft]}

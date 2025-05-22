@@ -14,6 +14,7 @@ import { decode } from 'html-entities';
 import { useTheme } from '../context/ThemeProvider';
 import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
+import { getRenderHtmlStyles } from '../utils/renderHtmlStyles';
 
 const PostDetail = ({ route }) => {
   const { postId } = route.params;
@@ -56,26 +57,7 @@ const PostDetail = ({ route }) => {
       <RenderHtml
         contentWidth={width}
         source={{ html: postDetail?.content?.rendered || '' }}
-        tagsStyles={{
-          p: {
-            fontSize: 16,
-            lineHeight: 24,
-            marginBottom: 12,
-            color: isDarkMode ? '#ccc' : '#333',
-          },
-          h1: {
-            fontSize: 22,
-            fontWeight: 'bold',
-            color: isDarkMode ? '#fff' : '#000',
-            marginBottom: 16,
-          },
-          img: {
-            width: '100%',
-            height: 'auto',
-            marginVertical: 15,
-            borderRadius: 8,
-          },
-        }}
+        tagsStyles={getRenderHtmlStyles(isDarkMode)}
         renderersProps={{
           img: {
             enableExperimentalPercentWidth: true,

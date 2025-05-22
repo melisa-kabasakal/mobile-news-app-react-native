@@ -87,27 +87,23 @@ const EditorunSectikleri = () => {
   return (
     <MainLayout>
       <ScrollView
-  style={{ flex: 1 }} 
-  contentContainerStyle={[
-    styles.container,
-    { backgroundColor: isDarkMode ? '#000' : '#fff' },
-  ]}
-  onMomentumScrollEnd={handleLoadMore}
-  keyboardShouldPersistTaps="handled" 
-  showsVerticalScrollIndicator={false} 
->
-
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: isDarkMode ? '#000' : '#fff' },
+        ]}
+        onMomentumScrollEnd={handleLoadMore}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         {posts.map((item) => (
           <TouchableOpacity
             key={item.id}
             onPress={() => navigation.navigate('AllPostDetail', { post: item.fullPost })}
-            style={[
-              styles.card,
-              {
-                backgroundColor: isDarkMode ? '#111' : '#fff',
-                borderColor: isDarkMode ? '#333' : '#ddd',
-              },
-            ]}
+            style={[styles.card, {
+              backgroundColor: isDarkMode ? '#111' : '#fff',
+              borderColor: isDarkMode ? '#333' : '#ddd',
+            }]}
           >
             <Image source={{ uri: item.image }} style={styles.image} />
             <Text style={[styles.title, { color: isDarkMode ? '#fff' : '#000' }]}>{item.title}</Text>
@@ -147,6 +143,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 6,
   },
   excerpt: {
     fontSize: 14,

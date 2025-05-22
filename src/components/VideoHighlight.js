@@ -2,21 +2,20 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   Image,
+  StyleSheet,
   ScrollView,
-  Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import Entypo from 'react-native-vector-icons/Entypo';
-
-const screenWidth = Dimensions.get('window').width;
+import { useTheme } from '../context/ThemeProvider';
 
 const VideoHighlight = () => {
   const [videos, setVideos] = useState([]);
   const navigation = useNavigation();
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -41,7 +40,7 @@ const VideoHighlight = () => {
   const others = videos.slice(1);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: isDarkMode ? '#000' : '#fff' }]}>
       <Text style={styles.sectionTitle}>Video Haber</Text>
 
       <TouchableOpacity onPress={() => goToDetail(main.youtubeId)} style={styles.mainVideo}>
@@ -49,8 +48,11 @@ const VideoHighlight = () => {
         <View style={styles.playButton}>
           <Entypo name="controller-play" size={28} color="#fff" />
         </View>
-        <Text style={styles.mainTitle}>{main.title}</Text>
+        <Text style={[styles.mainTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
+          {main.title}
+        </Text>
       </TouchableOpacity>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -68,7 +70,9 @@ const VideoHighlight = () => {
                 <Entypo name="controller-play" size={18} color="#fff" />
               </View>
             </View>
-            <Text style={styles.smallTitle} numberOfLines={2}>{item.title}</Text>
+            <Text style={[styles.smallTitle, { color: isDarkMode ? '#fff' : '#000' }]}>
+              {item.title}
+            </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -84,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   sectionTitle: {
-    backgroundColor: '#e53935',
+    backgroundColor: '#d71920',
     color: '#fff',
     fontSize: 20,
     fontWeight: 'bold',
@@ -92,18 +96,18 @@ const styles = StyleSheet.create({
     paddingLeft: 14,
   },
   mainVideo: {
-    marginTop: 10,
+    marginTop: 2,
     marginBottom: 15,
   },
   mainImage: {
-    width: screenWidth,
+    width: '100%',
     height: 220,
     alignSelf: 'center',
   },
   playButton: {
     position: 'absolute',
     top: 90,
-    left: (screenWidth - 60) / 2,
+    left: '45%',
     width: 50,
     height: 50,
     backgroundColor: 'rgba(255,0,0,0.8)',
