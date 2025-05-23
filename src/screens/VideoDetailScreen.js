@@ -1,25 +1,32 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, Dimensions, Platform } from 'react-native';
+import React, { useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Platform
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { useTheme } from '../context/ThemeProvider';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import MainLayout from '../components/MainLayout';
-
 
 const VideoDetailScreen = ({ route }) => {
   const { youtubeId } = route?.params || {};
   const embedUrl = `https://www.youtube.com/embed/${youtubeId}?playsinline=0`;
   const { isDarkMode } = useTheme();
-  const isFocused = useIsFocused();
 
-  useEffect(() => {
-    if (isFocused) {
+  // 🎯 Ekran görünürken yönü unlock, çıkarken tekrar portrait yap
+  useFocusEffect(
+    useCallback(() => {
       ScreenOrientation.unlockAsync();
-    } else {
-      ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP); 
-    }
-  }, [isFocused]);
+
+      return () => {
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+      };
+    }, [])
+  );
 
   if (!youtubeId) {
     return (
@@ -44,7 +51,6 @@ const VideoDetailScreen = ({ route }) => {
           mediaPlaybackRequiresUserAction={Platform.OS === 'android' ? false : undefined}
           style={{ flex: 1 }}
         />
-       
       </View>
     </MainLayout>
   );

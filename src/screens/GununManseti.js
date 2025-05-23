@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeProvider';
@@ -19,6 +20,9 @@ const GununManseti = () => {
   const [images, setImages] = useState([]);
   const [visibleCount, setVisibleCount] = useState(5);
   const [loading, setLoading] = useState(true);
+
+  const { width } = useWindowDimensions();
+
 
   const PROXY = 'https://69a5-88-253-133-120.ngrok-free.app';
 
@@ -53,11 +57,19 @@ const GununManseti = () => {
   }, []);
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => Linking.openURL(item.id)}>
-    <Image source={{ uri: item.uri }} style={styles.image} />
+  <TouchableOpacity onPress={() => Linking.openURL(item.id)}>
+    <Image
+      source={{ uri: item.uri }}
+      style={{
+        width: width,
+        height: (width * 1600) / 1130,
+        marginBottom: 20,
+      }}
+      resizeMode="contain"
+    />
   </TouchableOpacity>
+);
 
-  );
 
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + 5);
@@ -98,16 +110,10 @@ export default GununManseti;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
     paddingBottom: 80,
+    padding: 0,
   },
-  image: {
-    width: '100%',
-    height: 600,
-    resizeMode: 'contain',
-    marginBottom: 20,
-    
-  },
+ 
   button: {
     backgroundColor: '#006c9b',
     padding: 12,

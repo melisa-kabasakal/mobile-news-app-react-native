@@ -6,19 +6,23 @@ import {
   StyleSheet,
   ActivityIndicator,
   useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeProvider';
+import { useNavigation } from '@react-navigation/native';
 
 const GununMansetiPreview = () => {
   const { isDarkMode } = useTheme();
   const { width } = useWindowDimensions();
+  const navigation = useNavigation(); 
 
   const [firstImage, setFirstImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const LOCAL_IP = 'https://69a5-88-253-133-120.ngrok-free.app';
 
+
+  const LOCAL_IP = 'https://69a5-88-253-133-120.ngrok-free.app';
 
   useEffect(() => {
     const fetchPreview = async () => {
@@ -38,7 +42,6 @@ const GununMansetiPreview = () => {
           '<img$1src="$2" data-src="$2"'
         );
 
-        // Proxy yönlendirme
         html = html.replace(
           /<img[^>]*src="([^"]+)"[^>]*>/gi,
           (match, src) => {
@@ -47,7 +50,6 @@ const GununMansetiPreview = () => {
           }
         );
 
-        // İlk görseli yakala
         const match = html.match(/<img[^>]*src="([^"]+)"[^>]*>/i);
         const firstImg = match ? match[1] : null;
         setFirstImage(firstImg);
@@ -68,20 +70,32 @@ const GununMansetiPreview = () => {
   }
 
   return (
-    <View>
-      <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>Günün Manşeti</Text>
+    <View style={styles.wrapper}>
+      <Text style={[styles.headerText, { color: isDarkMode ? '#fff' : '#fff' }]}>
+        Günün Manşeti
+      </Text>
+
       {firstImage && (
-        <Image
-          source={{ uri: firstImage }}
-          style={styles.previewImage}
-          resizeMode="contain"
-        />
-      )}
+  <TouchableOpacity onPress={() => navigation.navigate('Günün Manşeti')}>
+    <Image
+      source={{ uri: firstImage }}
+      style={{
+        width: '100%', 
+        height: (width * 1600) / 1130, 
+      }}
+      resizeMode="cover"
+    />
+  </TouchableOpacity>
+)}
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    marginBottom: 30,
+  },
   headerText: {
     fontSize: 22,
     fontWeight: 'bold',
@@ -89,11 +103,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 6,
   },
-  previewImage: {
-    width: '100%',
-    height: 700,
-    marginBottom: 16,
-  },
+  
 });
 
 export default GununMansetiPreview;

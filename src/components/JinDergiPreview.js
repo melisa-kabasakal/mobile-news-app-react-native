@@ -56,13 +56,7 @@ const JinDergiPreview = () => {
       <TouchableOpacity onPress={handlePress} activeOpacity={0.8}>
         <Image
   source={{ uri: imageUrl }}
-  style={[
-    styles.image,
-    {
-      width: width - 32,
-      height: ((width - 32) * 1600) / 1130,
-    },
-  ]}
+  style={styles.image}
   resizeMode="cover"
 />
 
@@ -88,10 +82,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   image: {
-    height: 600,
-   
-    alignSelf: 'center',
-  },
+  width: '100%',
+  aspectRatio: 1130 / 1600,
+  
+  alignSelf: 'center',
+},
+
   caption: {
     marginTop: 10,
     fontSize: 14,
