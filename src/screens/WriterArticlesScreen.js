@@ -14,6 +14,7 @@ import { useTheme } from '../context/ThemeProvider';
 import { decode } from 'html-entities';
 import MainLayout from '../components/MainLayout';
 import Footer from '../components/Footer';
+import { getRenderHtmlStyles } from '../utils/renderHtmlStyles';
 
 const WriterArticlesScreen = ({ route, navigation }) => {
   const { writerLink, writerId } = route?.params ?? {};
@@ -104,10 +105,10 @@ const WriterArticlesScreen = ({ route, navigation }) => {
       <RenderHtml
         contentWidth={width}
         source={{ html: item.excerpt.rendered }}
-        tagsStyles={{
-          p: {
-            fontSize: 14,
-            color: isDarkMode ? '#ddd' : '#333',
+        tagsStyles={getRenderHtmlStyles(isDarkMode)}
+        renderersProps={{
+          img: {
+            enableExperimentalPercentWidth: true,
           },
         }}
       />

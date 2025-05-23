@@ -14,6 +14,9 @@ import Footer from './Footer';
 import RenderHtml from 'react-native-render-html';
 import { useTheme } from '../context/ThemeProvider';
 
+import { getRenderHtmlStyles } from '../utils/renderHtmlStyles';
+
+
 const AllPostDetail = ({ route }) => {
   const { isDarkMode } = useTheme();
   const { width } = useWindowDimensions();
@@ -64,6 +67,11 @@ const AllPostDetail = ({ route }) => {
   const imageUrl = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
   const title = he.decode(post.title.rendered);
   const htmlContent = post.content.rendered;
+  const cleanHtmlContent = htmlContent
+  .replace(/<img([^>]+)src=['"]{1}['"]{1}([^>]+)data-src=['"]([^'"]+)['"]/gi, '<img$1src="$3"$2data-src="$3"')
+  .replace(/<img([^>]*?)data-src=['"]([^'"]+)['"]/gi, '<img$1src="$2" data-src="$2"')
+  .replace(/<img([^>]*?)lazy-src=['"]([^'"]+)['"]/gi, '<img$1src="$2" lazy-src="$2"');
+
 
   return (
     <MainLayout>
@@ -80,46 +88,19 @@ const AllPostDetail = ({ route }) => {
 
         <RenderHtml
           contentWidth={width}
-          source={{ html: `<h1>${title}</h1>${htmlContent}` }}
+          source={{ html: `<h1>${title}</h1>${cleanHtmlContent}` }}
+
           baseStyle={{
             color: isDarkMode ? '#fff' : '#000',
             fontSize: 16,
             lineHeight: 24,
           }}
-          tagsStyles={{
-            h1: {
-              fontSize: 24,
-              fontWeight: 'bold',
-              marginBottom: 16,
-              color: isDarkMode ? '#fff' : '#000',
-            },
-            h2: {
-              fontSize: 20,
-              fontWeight: 'bold',
-              marginTop: 20,
-              marginBottom: 10,
-              color: isDarkMode ? '#fff' : '#000',
-            },
-            h3: {
-              fontSize: 18,
-              fontWeight: 'bold',
-              marginTop: 16,
-              marginBottom: 8,
-              color: isDarkMode ? '#fff' : '#000',
-            },
-            strong: {
-              fontWeight: 'bold',
-              color: isDarkMode ? '#fff' : '#000',
-            },
-            b: {
-              fontWeight: 'bold',
-              color: isDarkMode ? '#fff' : '#000',
-            },
-            p: {
-              marginBottom: 10,
-              color: isDarkMode ? '#ddd' : '#444',
-            },
-          }}
+          tagsStyles={getRenderHtmlStyles(isDarkMode)}
+  renderersProps={{
+    img: {
+      enableExperimentalPercentWidth: true,
+    },
+  }}
         />
 
         <View style={{ width, alignSelf: 'center', marginTop: 40 }}>

@@ -24,11 +24,11 @@ export const getRenderHtmlStyles = (isDarkMode) => ({
     color: isDarkMode ? '#ccc' : '#333',
   },
   img: {
-    width: '100%',
-    height: 'auto',
-    marginVertical: 15,
-    borderRadius: 8,
-  },
+  width: '100%',
+  height: 'auto',
+  marginVertical: 15,
+  borderRadius: 8,
+},
   strong: {
     fontWeight: 'bold',
     color: isDarkMode ? '#fff' : '#000',
